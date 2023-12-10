@@ -6357,7 +6357,7 @@ $(document).ready(function () {
 </blockquote>
 <p>The Census Bureau uses the responses from each sample of the population to extrapolate information about the total population, so there is some uncertainty around its estimates. Each estimate is reported along with a 90% margin of error.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> It’s extremely important that we incorporate this uncertainty in our analysis.</p>
 <p>The Census Bureau released the 2013-2017 ACS 5-year Estimates on December 6, 2018.</p>
-<p>We downloaded the population counts for the census block groups in Marion and Polk counties from the <a href="https://factfinder.census.gov/faces/nav/jsf/pages/index.xhtml">American FactFinder</a> from the 2010 Census as well as each of the years in the 2013-2017 5-year Estimates. I’ve re-hosted the data <a href="https://mathstat.dal.ca/~antoniov/popdata/">here</a> for convenience.</p>
+<p>We downloaded the population counts for the census block groups in Marion and Polk counties from the <a href="https://factfinder.census.gov/faces/nav/jsf/pages/index.xhtml">American FactFinder</a> from the 2010 Census as well as each of the years in the 2013-2017 5-year Estimates. I’ve re-hosted the data <a href="https://szego.github.io/popdata/">here</a> for convenience.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucG9wXzIwMTAgPC0gcmVhZC5jc3YoXCJwb3BfMjAxMC5jc3ZcIilcbnBvcF8yMDEzIDwtIHJlYWQuY3N2KFwicG9wXzIwMTMuY3N2XCIpXG5wb3BfMjAxNCA8LSByZWFkLmNzdihcInBvcF8yMDE0LmNzdlwiKVxucG9wXzIwMTUgPC0gcmVhZC5jc3YoXCJwb3BfMjAxNS5jc3ZcIilcbnBvcF8yMDE2IDwtIHJlYWQuY3N2KFwicG9wXzIwMTYuY3N2XCIpXG5wb3BfMjAxNyA8LSByZWFkLmNzdihcInBvcF8yMDE3LmNzdlwiKVxuYGBgIn0= -->
@@ -6630,7 +6630,7 @@ results[order(results$growth_rate),]</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-text-begin -->
-<p>This table of estimates can be downloaded <a href="https://mathstat.dal.ca/~antoniov/popdata/">here</a>.</p>
+<p>This table of estimates can be downloaded <a href="https://szego.github.io/popdata/">here</a>.</p>
 </div>
 </div>
 <div id="mapping-the-growth-rates" class="section level1">
@@ -6723,7 +6723,7 @@ leaflet(blockgroups) %&gt;%
 
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>The GeoJSON file used to make these maps can be downloaded <a href="https://mathstat.dal.ca/~antoniov/popdata/">here</a>. It was built in QGIS by merging the <a href="https://www.census.gov/geo/maps-data/data/cbf/cbf_blkgrp.html">shapefiles for the census block groups</a> from the U.S. Census Bureau with the estimates from our model.</p>
+<p>The GeoJSON file used to make these maps can be downloaded <a href="https://szego.github.io/popdata/">here</a>. It was built in QGIS by merging the <a href="https://www.census.gov/geo/maps-data/data/cbf/cbf_blkgrp.html">shapefiles for the census block groups</a> from the U.S. Census Bureau with the estimates from our model.</p>
 </div>
 <div id="appendix-fitting-the-model-in-rethinking" class="section level1">
 <h1><span class="header-section-number">4</span> Appendix: Fitting the model in <strong>rethinking</strong></h1>
@@ -6758,7 +6758,7 @@ fit2 &lt;- map2stan(
 <!-- rnb-text-begin -->
 <p>The slope estimates from this are essentially the same as those from the first model. Running this small number of iterations took about 90 minutes to fit on my laptop. Getting enough iterations for a clear picture of <code>sigma</code> would probably take just as long as, if not longer than, it took for the first model.</p>
 <hr />
-<p><a href="https://mathstat.dal.ca/~antoniov/">Antonio R. Vargas</a></p>
+<p><a href="https://szego.github.io/">Antonio R. Vargas</a></p>
 <p>22 Dec 2018</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->

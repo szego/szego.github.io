@@ -338,7 +338,7 @@ pre code {
 <p>Next we’ll download <a href="https://www.oregon.gov/ode/reports-and-data/students/Pages/Cohort-Graduation-Rate.aspx">ODE’s graduation data</a> and join it to the geometry above. We’ll also need a key I made a while back that matches the district names ODE uses with the names used by the district geometries above.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># NCES district names matched with ODE district names</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;https://mathstat.dal.ca/~antoniov/districts_homelessness/nces_and_ode_sd_names.csv&quot;</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;https://szego.github.io/districts_homelessness/nces_and_ode_sd_names.csv&quot;</span>,</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;nces_and_ode_sd_names.csv&quot;</span>,</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">mode =</span> <span class="st">&quot;wb&quot;</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -909,7 +909,7 @@ generated quantities {
 <p>On the whole, the INLA and Stan estimates are very similar, as expected.</p>
 <p>The main point of fitting the Stan model was to better understand the BYM2 model. Typically I would use INLA for this type of problem since it’s so fast. That said, knowing that I can implement it in Stan if I need some additional flexibility beyond what INLA can offer is comforting. Getting a fuller picture of the posterior for <code>phi</code> is nice too.</p>
 <hr />
-<p><a href="https://mathstat.dal.ca/~antoniov/">Antonio R. Vargas</a></p>
+<p><a href="https://szego.github.io/">Antonio R. Vargas</a></p>
 <p>27 March 2022</p>
 <script type="text/javascript">
 // This is javascript to make the headers go back to the TOC when clicked. 
