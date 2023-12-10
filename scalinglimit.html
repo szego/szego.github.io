@@ -1,0 +1,796 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>A problem sequence for the partial sums of the exponential
+      series - Antonio Vargas</title>
+    <link rel="stylesheet" type="text/css" href="math.css">
+	<link rel="stylesheet" type="text/css" href="body.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full">
+  </script>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+    });
+  </script>
+  </head>
+  <body style="margin: 25px auto; width: 740px;">
+    <a href="http://mathstat.dal.ca/%7Eantoniov/"><img style="border:
+        0px solid ; width: 740px; height: 35px;" src="escher740.png"
+        alt="back to main"></a><br>
+    <br>
+    <a href="#" class="section">Problem Sequence:<br>
+      Calculating a scaling limit for partial sums of the exponential
+      series</a> <br>
+    <br>
+    On this page are 21 problems. By solving these problems, the reader
+    will be guided through a fairly technical calculation involving the
+    partial sums of the exponential series.<br>
+    <br>
+    Starting from scratch, we will derive a scaling limit which gives
+    precise information about the locations of the zeros of the partial
+    sums. Along the way the reader will perform a complete application
+    of the saddle point method and derive the equation of the famous
+    Szegő curve.<br>
+    <br>
+    Our <a href="#theorem" class="bland">main result</a>
+    here originally appeared (without proof) as Lemma 2 in <a
+      href="zemyanproblems.html">my last post</a>. The purpose of this
+    problem sequence is to outline its proof.<br>
+    <br>
+    A blue superscript<sup class="citation">#</sup> will indicate that
+    there are relevant papers or books the interested reader might like
+    to see.<br>
+    <br>
+    <br>
+    <a href="#definitions" class="bland">1 Definitions</a><br>
+    <a href="#saddlepointmethod" class="bland">2 The saddle point method</a><br>
+    <a href="#choosingthecontour" class="bland">3 Choosing the right
+      contour</a><br>
+    <a href="#applyingthemethod" class="bland">4 Applying the method</a><br>
+	<a href="#notation" class="bland" style="margin-left:3em">4.1 Some notation</a><br>
+	<a href="#estimates" class="bland" style="margin-left:3em">4.2 Estimating the parts of the integral</a><br>
+    <a href="#theszegocurve" class="bland">5 The zeros of $p_{n-1}(nz)$
+      and the Szegő curve</a><br>
+    <a href="#howquickly" class="bland">6 How quickly do the zeros
+      approach the Szegő curve?</a><br>
+    <a href="#thescalinglimit" class="bland">7 The scaling limit</a><br>
+	<br>
+	<a href="#whyuniformity" class="bland">Appendix: Using the scaling limit (Why uniformity?)</a><br>
+    <a href="#furtherreading" class="bland">Appendix: Further reading</a><br>
+    <br>
+    <br>
+    <br>
+    <a href="#definitions" class="section" id="definitions">1
+      Definitions</a> <br>
+    <br>
+    <br>
+    Let
+    <div id="eq1.1">\[ p_n(z) = \sum_{k=0}^{n} \frac{z^k}{k!}. \tag{1.1} \]</div>
+    This polynomial $p_n(z)$ is commonly referred to as <span
+      style="font-style: italic;">the n</span><sup style="font-style:
+      italic;">th</sup><span style="font-style: italic;"> partial sum of
+      the exponential series</span> or <span style="font-style:
+      italic;">the n</span><sup style="font-style: italic;">th</sup><span
+      style="font-style: italic;"> Taylor polynomial of the exponential
+      function</span>.<br>
+    <br>
+    <br>
+    <div id="problem1">
+      <div id="outer">
+        <div id="inner2"><a href="#problem1" class="prob">Problem 1.</a>
+          Let $\gamma$ be a simple closed loop around the origin with
+          positive orientation. Show that \[ \frac{e^z -
+          p_{n-1}(z)}{z^n} = \frac{1}{2\pi i} \int_\gamma \zeta^{-n}
+          e^\zeta \,\frac{d\zeta}{\zeta-z} \] for all nonzero $z$ inside
+          $\gamma$. Then make a change of variables to show that
+          <div id="eq1.2">\[ \frac{e^{nz} - p_{n-1}(nz)}{(ez)^n} =
+            \frac{1}{2\pi i} \int_\gamma (es)^{-n} e^{ns}
+            \,\frac{ds}{s-z} \tag{1.2} \]</div>
+          for all nonzero $z$ inside $\gamma$.<sup><a href="#edrei"
+              class="citation">1</a></sup><br>
+          <br>
+          <span style="font-weight: bold;">Hint:</span> Show that \[
+          \int_{\gamma} \zeta^{-m} \,\frac{d\zeta}{\zeta - z} = 0 \] for
+          all integers $m \geq 1$. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    The precise nature of the contour $\gamma$ will be determined in <a
+      href="#choosingthecontour" class="bland">Section 3</a>.<br>
+    <br>
+    Define $\varphi(s) = s-1-\log s$, taking the principal branch of the
+    natural logarithm, so that \[ (es)^{-n} e^{ns} = \exp\{n(s-1-\log
+    s)\} = \exp\{n\varphi(s)\}. \]<br>
+    <br>
+    <a href="#saddlepointmethod" class="section" id="saddlepointmethod">2
+      The saddle point method</a> <br>
+    <br>
+    <br>
+    The saddle point method (also known as <span style="font-style:
+      italic;">the method of steepest descent</span>)<sup><a
+        href="#spmrefs" class="citation">2</a></sup> is a rigorous
+    application of a simple idea: the size of something is roughly equal
+    to the size of its biggest parts. The <q>something</q> here is an
+    integral, and its size will be roughly equal to the integral over
+    neighborhoods of the maxima of its integrand. Of course we are
+    interested in contour integrals in the complex plane, so we need to
+    define what we mean by <q>maxima</q> in this context.<br>
+    <br>
+    Suppose we have an integral of the form \[ F(n) = \int_\gamma
+    \exp\{n f(s)\}\,ds = \int_\gamma \exp\{n \operatorname{Re} f(s)\}
+    \exp\{in \operatorname{Im} f(s)\}\,ds, \qquad n &gt; 0. \] The size
+    of the integrand is \[ \lvert \exp\{n f(s)\} \rvert = \exp\{n
+    \operatorname{Re} f(s)\}, \] and this is largest where
+    $\operatorname{Re} f(s)$ is largest. However, because $F(n)$ is an
+    integral of a complex-valued function, if we integrate over a
+    generic contour $\gamma$ then the final size of the integral may be
+    sensitive to cancellation or resonance coming from the oscillatory
+    factor $\exp\{in \operatorname{Im} f(s)\}$. The main plan, then, is
+    to deform the contour in such a way that the integral remains
+    unchanged and that these oscillations are easy to handle.<br>
+    <br>
+    <br>
+    <div id="problem2">
+      <div id="outer">
+        <div id="inner2"><a href="#problem2" class="prob">Problem 2.</a>
+          Let $f$ be a function which is holomorphic at some point $z_0$
+          with $f'(z_0) = 0$ and $f''(z_0) \neq 0$.<br>
+          <br>
+          First show that $\operatorname{Re} f$ has a <a
+            href="https://en.wikipedia.org/wiki/Saddle_point">saddle
+            point</a> at $z_0$.<br>
+          <br>
+          Then show that there are two smooth curves $\Gamma_1$ and
+          $\Gamma_2$ passing through $z_0$ such that<br>
+          <ol type="a">
+            <li>$\Gamma_1$ and $\Gamma_2$ are orthogonal at $z_0$,</li>
+            <li>$\operatorname{Im} f$ is constant on $\Gamma_1$ and
+              $\Gamma_2$, and</li>
+            <li>$\operatorname{Re} f$ has a maximum at $z_0$ when
+              restricted to $\Gamma_1$ and a minimum at $z_0$ when
+              restricted to $\Gamma_2$.<br>
+            </li>
+          </ol>
+          We will call $\Gamma_1$ the <span style="font-style: italic;">steepest descent path </span>and $\Gamma_2$ the <span style="font-style:
+            italic;">steepest ascent path</span>.<br>
+          <br>
+          In other words, the two curves passing through a simple
+          critical point $z_0$ of $f$ on which $\operatorname{Im} f$ is
+          constant are the steepest ascent and descent paths through the
+          saddle at $z_0$ on the graph of $\operatorname{Re} f$.<br>
+          <br>
+          <span style="font-weight: bold;">Note:</span> This is Exercise
+          2 in Chapter 8 of Stein &amp; Shakarchi's <span
+            style="font-style: italic;">Complex Analysis</span>. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div id="axisdef">
+      <div id="outer">
+        <div id="inner2"><a href="#axisdef" class="prob">Definition 1.</a>
+          The <i>axis</i> of a saddle point $z_0$ of a function $f$ is defined to be the
+          straight line in the $z$-plane defined by \[
+          f''(z_0)(z-z_0)^2 \leq 0. \] One can check that the
+          steepest descent path $\Gamma_1$ from <a href="#problem2"
+            class="bland">Problem 2</a> is tangent to the axis of $z_0$
+          at $z_0$.</div>
+      </div>
+    </div>
+    <br>
+    <br>
+	<img src="scalinglimit_pics\saddle.png" id="figure1"><br>
+	<br>
+	<a href="#figure1" class="prob">Figure 1.</a> Two perspectives of the saddle point at $z=1$ of the function $\varphi(z)$ defined at the end of <a href="#definitions" class="bland">Section 1</a>. Over the surface $\operatorname{Re} \varphi(z)$ we see the <i>steepest descent path</i> in blue, the <i>steepest ascent path</i> in red, and the <i>axis</i> of the saddle point in white.<br>
+	<br>
+	<br>
+    So, if we can deform $\gamma$ so that it passes through a critical
+    point of $f$ along a path of steepest descent on the surface
+    $\operatorname{Re} f$, then $\operatorname{Im} f$ will be constant
+    on $\gamma$, say $\operatorname{Im} f =: I_0$, and we will have \[
+    F(n) = \int_\gamma \exp\{n \operatorname{Re} f(s)\} \exp\{in
+    I_0\}\,ds = \exp\{in I_0\} \int_\gamma \exp\{n \operatorname{Re}
+    f(s)\} \,ds. \] What remains is a <span style="font-style: italic;">real</span>
+    integral. The new integrand $\exp\{n \operatorname{Re} f(s)\}$ will
+    have a maximum at the critical point, and we can apply the basic
+    principle discussed above: the integral will be roughly equal to the
+    integral over a neighborhood of the maximum of its integrand.<br>
+    <br>
+    These are the broad strokes of the method we will apply to this
+    calculation.<br>
+    <br>
+    <br>
+    <br>
+    <a href="#choosingthecontour" class="section"
+      id="choosingthecontour">3 Choosing the right contour</a> <br>
+    <br>
+    <br>
+    In this section we will perform a series of calculations to
+    determine which qualities we need the contour $\gamma$ to have.<br>
+    <br>
+    The contour integral formula <a href="#eq1.2" class="eqref">$(1.2)$</a>
+    we derived in <a href="#problem1" class="bland">Problem 1</a> is
+    only valid for $z$ inside $\gamma$, so we need to make sure that
+    $\gamma$ is large enough so that it encompasses all zeros of
+    $p_{n-1}(nz)$. To determine a rough bound for the zeros we will use
+    the following classical result.<sup><a href="#ek" class="citation">3</a></sup><br>
+    <br>
+    <br>
+    <div id="ektheorem">
+      <div id="outer">
+        <div id="inner2"><a href="#ektheorem" class="prob">Eneström-Kakeya
+
+            Theorem.</a> If $q(z) = \sum_{k=0}^{m} a_k z^k$ is a
+          polynomial with \[ 0 \leq a_0 \leq a_1 \leq \cdots \leq a_m,
+          \] then all zeros of $q$ lie in the closed disk $|z| \leq 1$.
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div id="problem3">
+      <div id="outer">
+        <div id="inner2"><a href="#problem3" class="prob">Problem 3.</a>
+          Use the Eneström-Kakeya theorem to show that all zeros of
+          $p_{n-1}(nz)$ lie in the open disk $|z| < 1$.<br>
+          <br>
+          <b>Bonus:</b> Prove the Eneström-Kakeya theorem. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+	<img src="scalinglimit_pics\zerobound.png" class="center" id="figure2"><br>
+	<a href="#figure2" class="prob">Figure 2.</a> The 29 zeros of the polynomial $p_{29}(30z)$ are shown as white dots. As predicted by <a href="#problem3" class="bland">Problem 3</a>, these zeros lie inside the unit circle (shown in blue).<br>
+	<br>
+	<br>
+    From this calculation, we know that if we take $\gamma$ to lie on or
+    outside the unit circle, it will contain all zeros of $p_{n-1}(nz)$.<br>
+    <br>
+    <br>
+    <div id="problem4">
+      <div id="outer">
+        <div id="inner2"><a href="#problem4" class="prob">Problem 4.</a>
+          Show that the only critical point of $\varphi(s)$ is located
+          at $s=1$ and that \[ \varphi(s) = \tfrac{1}{2} (s-1)^2 +
+          \text{higher order terms} \] near there.<br>
+          <br>
+          Further, show that the <a href="#axisdef">axis</a> of this
+          critical point is the vertical line $\operatorname{Re} s = 1$.
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    At the critical point we have $\operatorname{Re} \varphi(1) = 0$.
+    Based on the discussion in the previous section, we want this to be
+    the highest point of $\gamma$ on the graph of $\operatorname{Re}
+    \varphi(s)$.<br>
+    <br>
+    If we travel away from $s=1$ upwards along the path of steepest
+    descent, we will end up in the region $\operatorname{Re} \varphi(s)
+    &lt; 0$. We should then choose the contour so that it remains in
+    this region $\operatorname{Re} \varphi(s) &lt; 0$, winds
+    counterclockwise around the origin, then returns to the critical
+    point. But is this possible?<br>
+    <br>
+    <br>
+    <div id="problem5">
+      <div id="outer">
+        <div id="inner2"><a href="#problem5" class="prob">Problem 5.</a>
+          Show that if $\operatorname{Re} \varphi(s) = 0$ then either
+          $s=1$, $\operatorname{Re} s &gt; 1$, or $|s| &lt; 1$. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    So, for example, the circle $|s| = 1$ passes through the critical
+    point of $\varphi$ tangent to the path of steepest descent and lies
+    entirely in the region $\operatorname{Re} \varphi &lt; 0$ except at
+    the point $s=1$.<br>
+    <br>
+    Problems <a href="#problem3" class="bland">3</a>, <a href="#problem4" class="bland">4</a>, and <a href="#problem5" class="bland">5</a> motivate the following choice for our contour
+    $\gamma$:<br>
+    <br>
+    <br>
+    <div id="gammadef">
+      <div id="outer">
+        <div id="inner2"><a href="#gammadef" class="prob">The contour
+            $\gamma$.</a> Let $\gamma$ be a simple closed loop around
+          the origin which passes through the point $s=1$ and lies
+          entirely in the regions $|s| &gt; 1$ and $\operatorname{Re}
+          \varphi(s) &lt; 0$ except at $s=1$. In a small neighborhood
+          $U_\gamma$ of $s=1$, let $\gamma$ coincide with the path of
+          steepest descent through $s=1$ on the graph of
+          $\operatorname{Re} \varphi(s)$. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+	<img src="scalinglimit_pics\gamma.png" class="center" id="figure3"><br>
+	<a href="#figure3" class="prob">Figure 3.</a> A plot of the contour $\gamma$ in white. Note how it avoids the region $\operatorname{Re} \varphi(s) > 0$ (shown in red) except at the saddle point $s=1$. In the region $U_\gamma$ (shown in yellow), the contour coincides with the steepest descent path through the saddle (shown in blue).<br>
+	<br>
+	<br>
+	From <a href="#problem2" class="bland">Problem 2</a> we know that $\operatorname{Im} \varphi(s)$ is constant on $\gamma \cap U_\gamma$. In fact, $\operatorname{Im} \varphi(s) = 0$ there.<br>
+	<br>
+    These conditions ensure that all zeros of $p_{n-1}(nz)$ lie inside
+    the contour, that $s=1$ is the highest point of the contour on the
+    surface $\operatorname{Re} \varphi(s)$, and that $\gamma$ coincides
+    with the path of steepest descent near that point.<br>
+    <br>
+    <br>
+    <br>
+    <a href="#applyingthemethod" class="section" id="applyingthemethod">4 Applying the method</a> <br>
+	<br>
+	<br>
+	In this section we will work through the technical details of the saddle point method. We will carefully break the integral in <a href="#eq1.2" class="eqref">$(1.2)$</a> into pieces then estimate the size of each piece. After whittling away the insignificant parts we will be left with a (relatively) simple expression representing the integral's dominant behavior as $n \to \infty$.<br>
+    <br>
+    <br>
+	<br>
+    <a href="#notation" class="subsection" id="notation">4.1 Some notation</a><br>
+    <br>
+    <br>
+    In analysis we often only need a rough idea of a thing's size. The point of the notation we'll introduce in this section is to hide irrelevant details when making estimates and to emphasize ballpark comparisons.<br>
+	<br>
+	The first piece of notation is <q>big-O notation</q>, written $O(\cdots)$. If $a_n(z)$ and $b_n(z)$ are sequences which depend on a complex parameter $z$, $d_n$ is another sequence which doesn't, and $A$ is some subset of the complex plane, the statement <div id="eq4.1">\[ ``\,\, a_n(z) = b_n(z) + O(d_n) \quad \text{as } n \to \infty \text{ uniformly for } z \in A \," \tag{4.1} \]</div> means that there are positive constants $C$ and $M$ which do not depend on $z$ such that the inequality <div id="eq4.2">\[ \lvert a_n(z) - b_n(z) \rvert \leq C\lvert d_n \rvert \tag{4.2} \]</div> holds for all $n \geq M$ and all $z \in A$.<br>
+	<br>
+	Qualitatively, writing $a_n(z) = b_n(z) + O(d_n)$ means that the error in estimating $a_n(z)$ by $b_n(z)$ is at most something like $d_n$.<br>
+	<br>
+	Notice that the constants $C$ and $M$ are not specified by the statement in <a href="#eq4.1" class="eqref">$(4.1)$</a>. This is a <em>feature</em>, not a bug! We won't care what those constants are, only that they exist. The beauty of big-O notation is that we can hide these constants and rewrite the inequality <a href="#eq4.2" class="eqref">$(4.2)$</a> as a sort of faux equality; algebraically, <a href="#eq4.1" class="eqref">$(4.1)$</a> behaves pretty much like a normal equation.<br>
+	<br>
+	It's also sometimes useful to consider $O(\cdots)$ as the set all of sequences which are bounded by a constant multiple of $\lvert \cdots \rvert$. We can then compare these sets using $\subset$, $=$, etc. For example, $O(n^{-2}) \subset O(n^{-1})$ as $n \to \infty$. If $a_n$, $b_n$, and $d_n$ are sequences of complex numbers, then the statement $O(b_n) \subset O(d_n)$ is equivalent to \[ a_n = O(b_n) \quad \text{as } n \to \infty \quad \Longrightarrow \quad a_n = O(d_n) \quad \text{as } n \to \infty, \] where both <q>equalities</q> are meant to be interpreted as in <a href="#eq4.1" class="eqref">$(4.1)$</a> and <a href="#eq4.2" class="eqref">$(4.2)$</a>.<br>
+    <br>
+	The last piece of notation we'll introduce is the $\sim$ notation. The statement \[ ``\,\, a_n(z) \sim b_n(z) \quad \text{as } n \to \infty \text{ uniformly for } z \in A \," \] means that \[ \lim_{n \to \infty} \frac{a_n(z)}{b_n(z)} = 1 \] uniformly for $z \in A$. Here we say that $a_n(z)$ is <i>asymptotically equivalent</i> to $b_n(z)$.<br>
+    <br>
+    <br>
+    <br>
+    <a href="#estimates" class="subsection" id="estimates">4.2 Estimating the parts of the integral</a><br>
+    <br>
+    <br>
+    From our discussion in the previous sections, we expect that the
+    main contribution to our integral <a href="#eq1.2" class="eqref">$(1.2)$</a>
+    comes from a neighborhood of the point $s=1$. So we break our
+    integral in two,
+    <div id="eq4.3">\[ \int_\gamma = \int_{\gamma \text{ near } 1} +
+      \int_{\gamma \text{ away from } 1}, \tag{4.3} \]</div>
+    and expect that the integral over the part of $\gamma$ away from
+    $s=1$ is much smaller than the part near $s=1$.<br>
+    <br>
+    <br>
+    <div id="problem6">
+      <div id="outer">
+        <div id="inner2"><a href="#problem6" class="prob">Problem 6.</a>
+          Show that there are open sets $U$ and $V$ such that $1 \in U$,
+          $0 \in V$, and a biholomorphic map $\psi : V \to U$ which
+          satisfies \[ (\varphi \circ \psi)(x) = x^2 \] for $x \in V$
+          with $\psi'(0) = \sqrt{2}$.<br>
+          <br>
+          Note that $\psi(0) = 1$ and that $U$ and $V$ can be made
+          arbitrarily small, so that we may take $U \subset U_\gamma$
+          (the set $U_\gamma$ is defined <a href="#gammadef"
+            class="bland">above</a>). In fact, we can take $V$ to be an
+          open disk. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    This gives us a neighborhood $U$ of $s=1$ which we can use to make <a
+      href="#eq4.3" class="eqref">$(4.3)$</a> precise: let us split the
+    integral in <a href="#eq1.2" class="eqref">$(1.2)$</a> as \[
+    \int_\gamma = \int_{\gamma \cap U} + \int_{\gamma \setminus U}. \]
+    The first thing we do is show that the integral over $\gamma
+    \setminus U$ is exponentially small.<br>
+    <br>
+    <br>
+    <div id="nepsilondef">
+      <div id="outer">
+        <div id="inner2"><a href="#nepsilondef" class="prob">Definition
+            2.</a> For $\epsilon &gt; 0$, let $N_\epsilon$ be the set of
+          all points within a distance of $\epsilon$ of the curve
+          $\gamma$. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div id="problem7">
+      <div id="outer">
+        <div id="inner2"><a href="#problem7" class="prob">Problem 7.</a>
+          Show that there is a constant $C_1 &gt; 0$ which does not
+          depend on $z$ such that \[ \left\lvert \int_{\gamma \setminus
+          U} e^{n\varphi(s)} \,\frac{ds}{s-z} \right\rvert &lt; e^{-C_1
+          n} \] for all $z \notin N_\epsilon$. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    In big-O notation, we have shown that
+    <div id="eq4.4">\[ \int_{\gamma} e^{n\varphi(s)} \,\frac{ds}{s-z} =
+      \int_{\gamma \cap U} e^{n\varphi(s)} \,\frac{ds}{s-z} +
+      O\!\left(e^{-C_1 n}\right) \tag{4.4} \]</div>
+    uniformly for $z \notin N_\epsilon$.<br>
+    <br>
+    Now we turn our attention to the remaining integral over $\gamma
+    \cap U$.<br>
+    <br>
+    <br>
+    <div id="problem8">
+      <div id="outer">
+        <div id="inner2"><a href="#problem8" class="prob">Problem 8.</a>
+          Show that \[ \int_{\gamma \cap U} e^{n\varphi(s)}
+          \,\frac{ds}{s-z} = \int_{-\alpha_1}^{\alpha_2} e^{-nt^2}
+          \frac{i\psi'(it)}{\psi(it)-z}\,dt \] for some positive numbers
+          $\alpha_1$ and $\alpha_2$. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    After this change of variables, the largest contribution to the
+    integral comes from a neighborhood of $t=0$ since the exponential
+    factor eliminates everything else as $n \to \infty$. We thus
+    estimate the subexponential factor at this point.<br>
+    <br>
+    <br>
+    <div id="problem9">
+      <div id="outer">
+        <div id="inner2"><a href="#problem9" class="prob">Problem 9.</a>
+          Define \[ g_z(t) = \frac{i\psi'(it)}{\psi(it)-z}. \] Show
+          that, for $z \notin N_\epsilon$, there is a positive constant
+          $M$ that does not depend on $z$ such that \[ |g_z(t) - g_z(0)|
+          \leq M|t| \] for $t \in V$. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    To apply this approximation, write \[ \begin{align}
+    \int_{-\alpha_1}^{\alpha_2} e^{-nt^2}
+    \frac{i\psi'(it)}{\psi(it)-z}\,dt &amp;= \int_{-\alpha_1}^{\alpha_2}
+    e^{-nt^2} g_z(t)\,dt \\ &amp;= g_z(0)\int_{-\alpha_1}^{\alpha_2}
+    e^{-nt^2}\,dt + \int_{-\alpha_1}^{\alpha_2} e^{-nt^2} (g_z(t) -
+    g_z(0))\,dt. \end{align} \]<br>
+    <br>
+    <div id="problem10">
+      <div id="outer">
+        <div id="inner2"><a href="#problem10" class="prob">Problem 10.</a>
+          Show that \[ \left\lvert \int_{-\alpha_1}^{\alpha_2} e^{-nt^2}
+          (g_z(t) - g_z(0))\,dt \right\rvert &lt; \frac{M}{n} \] for $z
+          \notin N_\epsilon$. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    In big-O notation, we have shown that
+    <div id="eq4.5">\[ \int_{-\alpha_1}^{\alpha_2} e^{-nt^2}
+      \frac{i\psi'(it)}{\psi(it)-z}\,dt =
+      g_z(0)\int_{-\alpha_1}^{\alpha_2} e^{-nt^2}\,dt +
+      O\!\left(\frac{1}{n}\right) \tag{4.5} \]</div>
+    uniformly for $z \notin N_\epsilon$.<br>
+    <br>
+    <br>
+    <div id="problem11">
+      <div id="outer">
+        <div id="inner2"><a href="#problem11" class="prob">Problem 11.</a>
+          Show that there is a positive constant $C_2$ such that \[
+          \int_{-\alpha_1}^{\alpha_2} e^{-nt^2}\,dt = \sqrt\frac{\pi}{n}
+          + O\!\left(e^{-C_2 n}\right), \] and hence that
+          <div id="eq4.6">\[ g_z(0)\int_{-\alpha_1}^{\alpha_2}
+            e^{-nt^2}\,dt = g_z(0) \sqrt\frac{\pi}{n} + O\!\left(e^{-C_2
+            n}\right) \tag{4.6} \]</div>
+          for $z$ bounded away from the point $z=1$. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    All that remains is to reassemble the various parts.<br>
+    <br>
+    By combining <a href="#eq4.5" class="eqref">$(4.5)$</a> and <a
+      href="#eq4.6" class="eqref">$(4.6)$</a> we get the estimate \[
+    \int_{-\alpha_1}^{\alpha_2} e^{-nt^2}
+    \frac{i\psi'(it)}{\psi(it)-z}\,dt = g_z(0) \sqrt\frac{\pi}{n} +
+    O\!\left(\frac{1}{n}\right) \] uniformly for $z \notin N_\epsilon$
+    since $O(e^{-C_2 n}) \subset O(1/n)$. Substituting this in <a
+      href="#eq4.4" class="eqref">$(4.4)$</a> yields \[ \int_{\gamma}
+    e^{n\varphi(s)} \,\frac{ds}{s-z} = \frac{i}{1-z} \sqrt\frac{2\pi}{n}
+    + O\!\left(\frac{1}{n}\right) \] uniformly for $z \notin
+    N_\epsilon$, where we have used the fact that \[ g_z(0) =
+    \frac{i\sqrt{2}}{1-z}. \] Finally, substituting this in <a
+      href="#eq1.2" class="eqref">$(1.2)$</a> yields
+    <div id="eq4.7">\[ \frac{e^{nz} - p_{n-1}(nz)}{(ez)^n} =
+      \frac{1}{(1-z)\sqrt{2\pi n}} + O\!\left(\frac{1}{n}\right) \tag{4.7}
+      \]</div>
+    uniformly for $z$ inside $\gamma$ with $z \neq 0$ and $z \notin
+    N_\epsilon$.<br>
+    <br>
+    This completes our application of the saddle point method.<br>
+    <br>
+    <br>
+    <br>
+    <a href="#theszegocurve" class="section" id="theszegocurve">5 The
+      zeros of $p_{n-1}(nz)$ and the Szegő curve</a> <br>
+    <br>
+    <br>
+    <div id="problem12">
+      <div id="outer">
+        <div id="inner2"><a href="#problem12" class="prob">Problem 12.</a><br>
+          <ol>
+            <li>Show that all zeros $p_{n-1}(nz)$ lie inside $\gamma$
+              with $z \neq 0$.</li>
+            <li>For $\delta &gt; 0$, show that there is an $\epsilon
+              &gt; 0$ such that all zeros satisfying $\lvert z-1 \rvert
+              &gt; \delta$ are not in $N_\epsilon$.</li>
+          </ol>
+          <span style="font-weight: bold;">Hint:</span> Use <a
+            href="#problem3" class="bland">Problem 3</a>. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    It follows from <a href="#problem12" class="bland">Problem 12</a>
+    and equation <a href="#eq4.7" class="eqref">$(4.7)$</a> that every zero
+    of $p_{n-1}(nz)$ which is bounded away from $1$ satisfies the
+    equation<sup><a href="#szegoasymp" class="citation">4</a></sup>
+    <div id="eq5.1">\[ \left(z e^{1-z}\right)^{-n} =
+      \frac{1}{(1-z)\sqrt{2\pi n}} + O\!\left(\frac{1}{n}\right).
+      \tag{5.1} \]</div>
+    <br>
+    <br>
+    <div id="problem13">
+      <div id="outer">
+        <div id="inner2"><a href="#problem13" class="prob">Problem 13.</a>
+          Show that, as $n \to \infty$, the zeros of $p_{n-1}(nz)$
+          converge to the portion of the curve $\left\lvert z e^{1-z}
+          \right\rvert = 1$ that lies in the disk $\lvert z \rvert \leq
+          1$. </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    The curve
+    <div id="eq5.2">\[ S := \left\{ z \in \mathbb C : \left\lvert z
+      e^{1-z} \right\rvert = 1 \text{ and } \lvert z \rvert \leq 1
+      \right\} \tag{5.2} \]</div>
+    is called the <span style="font-style: italic;">Szegő curve</span>.
+    It is named after Gabor Szegő, who first derived the curve in 1924.<br>
+    <br>
+	<img src="scalinglimit_pics\szegocurve.png" class="center" id="figure4"><br>
+	<a href="#figure4" class="prob">Figure 4.</a> The Szegő curve $S$ is shown in red, along with the zeros of $p_{29}(30z)$ in white and the unit circle in blue. Compare with <a href="#figure2" class="bland">Figure 2</a>.<br>
+	<br>
+	<br>
+    Note that the condition $\left\lvert z e^{1-z} \right\rvert = 1$ can
+    also be written as $\operatorname{Re} \varphi(z) = 0$.<br>
+    <br>
+    <br>
+    <br>
+    <a href="#howquickly" class="section" id="howquickly">6 How quickly
+      do the zeros approach the Szegő curve?</a> <br>
+    <br>
+    <br>
+    Now that we know the global behavior of the zeros of $p_{n-1}(nz)$,
+    we can begin to study their precise locations. In this section we
+    will not try to be totally rigorous, instead focusing on exploratory
+    analysis. Our findings here will allow us to guess the form of <a href="#theorem" class="bland">the final result</a>.
+    It is not strictly necessary to solve these problems in order to move on to the next section.<br>
+    <br>
+    If we omit the $O(1/n)$ term, equation <a href="#eq5.1" class="eqref">$(5.1)$</a>
+    basically says that the zeros of $p_{n-1}(nz)$ which do not converge
+    to the point $z=1$ satisfy
+    <div id="eq6.1">\[ \exp\{ n \varphi(z) \} \approx \frac{e^{-(\log
+      n)/2}}{(1-z)\sqrt{2\pi}}. \tag{6.1} \]</div>
+    Let's assume that $z$ converges to some point $\xi \in S$ with $\xi
+    \neq 1$, and write $z = \xi + \delta$, where $\delta \to 0$ as $n
+    \to \infty$.<br>
+    <br>
+    <br>
+    <div id="problem14">
+      <div id="outer">
+        <div id="inner2"><a href="#problem14" class="prob">Problem 14.</a>
+          Show that $1-z \approx 1-\xi$ and that \[\varphi(z) \approx
+          \varphi(\xi) + \frac{\xi - 1}{\xi}\delta. \]<br>
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    Our estimate in <a href="#eq6.1" class="eqref">$(6.1)$</a> then
+    becomes
+    <div id="eq6.2">\[ \exp\!\left\{ n\varphi(\xi) + \frac{\xi -
+      1}{\xi}n\delta \right\} \approx \frac{e^{-(\log
+      n)/2}}{(1-\xi)\sqrt{2\pi}}. \tag{6.2} \]</div>
+    <br>
+    <br>
+    <div id="problem15">
+      <div id="outer">
+        <div id="inner2"><a href="#problem15" class="prob">Problem 15.</a>
+          Show that $\operatorname{Re} \varphi(\xi) = 0$ and hence that
+          $\exp\{ n\varphi(\xi)\}$ is bounded.<br>
+          <br>
+          Deduce that, in order to balance the decay of the factor
+          $e^{-(\log n)/2}$ on the right-hand side of <a href="#eq6.2"
+            class="eqref">$(6.2)$</a>, we must have \[ \delta \approx
+          \frac{\xi \log n}{2(1-\xi)n}. \] </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    This estimate for $\delta$ tells us that the zeros in question
+    approach the Szegő curve at a rate proportional to $\log n/n$, but
+    it does not include anything which differentiates between separate
+    zeros of $p_{n-1}(nz)$. We expect that such information will be
+    contained in a subsequent correction term. Perhaps the correct
+    estimate takes the form \[ \delta \approx \frac{\xi \log
+    n}{2(1-\xi)n} + \frac{v_n}{n}, \] where $v_n$ is some bounded
+    sequence. By substituting this into <a href="#eq6.2" class="eqref">$(6.2)$</a>
+    we get \[ \exp\!\left\{n \varphi(\xi) + \frac{\xi - 1}{\xi} v_n
+    \right\} \approx \frac{1}{(1-\xi)\sqrt{2\pi}}. \] One thing this
+    estimate tells us is that, as $n \to \infty$, the limit of the
+    left-hand side should exist.<br>
+    <br>
+    <br>
+    <div id="problem16">
+      <div id="outer">
+        <div id="inner2"><a href="#problem16" class="prob">Problem 16.</a>
+          Let $(v_n)$ be a bounded sequence. Show that, to make \[
+          \lim_{n \to \infty} \exp\!\left\{n \varphi(\xi) + \frac{\xi -
+          1}{\xi} v_n \right\} \] exist, we should choose $v_n =
+          (w_n-i\tau_n)\xi/(1-\xi)$, where $(w_n)$ is a convergent
+          sequence and \[ \tau_n \equiv n \operatorname{Im} \varphi(\xi)
+          \pmod{2\pi}. \]
+		 </div>
+      </div>
+    </div><br>
+    <br>
+    <br>
+    <br>
+    <a href="#thescalinglimit" class="section" id="thescalinglimit">7
+      The scaling limit</a> <br>
+    <br>
+    <br>
+    We now have the information necessary to state our main result.<sup><a href="#esv" class="citation">5</a></sup> Its proof is broken up into the five problems which follow it.<br>
+    <br>
+    <br>
+    <div id="theorem">
+      <div id="outer">
+        <div id="inner2"><a href="#theorem" class="prob">Theorem.</a>
+          Let $\xi \in S$ with $\xi \neq 1$. Define the sequence
+          $(\tau_n)$ by \[ \tau_n \equiv n\operatorname{Im}(\xi - 1 -
+          \log \xi) \pmod{2\pi}, \quad -\pi &lt; \tau_n \leq \pi \] and
+          set \[ z_n(w) = \xi + \frac{\xi\log n}{2(1-\xi)n} -
+          \frac{(w-i\tau_n)\xi}{(1-\xi)n}. \] Then <div id="eq7.1">\[ \lim_{n \to
+          \infty} \frac{p_{n-1}(n z_n(w))}{\exp(n z_n(w))} = 1 -
+          \frac{e^{-w}}{(1-\xi)\sqrt{2\pi}} \tag{7.1}\]</div> uniformly on compact
+          subsets of the $w$-plane.
+        </div>
+      </div>
+    </div>
+	<br>
+    <br>
+	<img src="scalinglimit_pics\scalinglimit.gif" class="center" id="figure5"><br>
+	<a href="#figure5" class="prob">Figure 5.</a> This animation illustrates how the scaling limit in the theorem tracks the zeros of $p_{n-1}(nz)$ (shown in white) as $n$ increases from 20 to 100. A point $\xi$ (shown in yellow) on the Szegő curve (shown in red) is chosen, and for each $n$ the image of a square in the $w$-plane under the map $z_n(w)$ is shown in blue. This blue square approaches $\xi$ at the same rate that the zeros of $p_{n-1}(nz)$ do. As $n$ increases, the number of zeros in the square becomes fixed and the zeros flatten out into a line parallel with the side of the square. Note that the zeros of the right-hand side of <a href="#eq7.1" class="eqref">$(7.1)$</a> also lie on a straight line.<br>
+    <br>
+    <br>
+	In the following problems, suppose that $w$ is restricted to an arbitrary compact subset of $\mathbb C$.<br>
+	<br>
+	<br>
+	<div id="problem17">
+      <div id="outer">
+        <div id="inner2"><a href="#problem17" class="prob">Problem 17.</a>
+           Show that $z_n(w)$ is inside $\gamma$ and $z_n(w) \notin N_\epsilon$ for $n$ large enough.
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+	<div id="problem18">
+      <div id="outer">
+        <div id="inner2"><a href="#problem18" class="prob">Problem 18.</a>
+           Use equation <a href="#eq4.7" class="eqref">$(4.7)$</a> to show that \[ \frac{\exp(n z_n(w))}{(e z_n(w))^n} \left( \frac{p_{n-1}(n z_n(w))}{\exp(n z_n(w))} - 1 \right) \sim -\frac{1}{(1-\xi)\sqrt{2\pi n}} \] as $n \to \infty$ uniformly with respect to $w$.
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+	<div id="problem19">
+      <div id="outer">
+        <div id="inner2"><a href="#problem19" class="prob">Problem 19.</a>
+           Show that \[ z_n(w)^n \sim \xi^n n^{1/[2(1-\xi)]} \exp\left\{-\frac{w-i\tau_n}{1-\xi}\right\} \] as $n \to \infty$ uniformly with respect to $w$.
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+	<div id="problem20">
+      <div id="outer">
+        <div id="inner2"><a href="#problem20" class="prob">Problem 20.</a>
+           Show that \[ \frac{\exp(n z_n(w))}{(e z_n(w))^n} \sim \frac{e^w}{\sqrt{n}} \] as $n \to \infty$ uniformly with respect to $w$.
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+	<div id="problem21">
+      <div id="outer">
+        <div id="inner2"><a href="#problem21" class="prob">Problem 21.</a>
+           Prove <a href="#eq7.1" class="eqref">$(7.1)$</a>.
+        </div>
+      </div>
+    </div>
+    <br>
+    <br>
+    Now that we've obtained this limit we can use it to locate individual zeros of $p_{n-1}(nz)$, as
+    was done in <a href="zemyanproblems.html">my last post here</a>.<br>
+    <br>
+    <br>
+    <br>
+	<a href="#whyuniformity" class="section" id="whyuniformity">Appendix: Using the scaling limit (Why uniformity?)</a> <br>
+	<br>
+	<br>
+	The calculations in this problem sequence would be much simpler if we did not require uniform convergence of the limit in <a href="#eq7.1" class="eqref">$(7.1)$</a>. The main reason we require it is so that we can apply Hurwitz's theorem to connect the zeros of the limit function to the zeros of the polynomials.<br>
+	<br>
+	<br>
+	<div id="hurwitz">
+      <div id="outer">
+        <div id="inner2"><a href="#hurwitz" class="prob">Hurwitz's theorem.</a>
+           Let $f_n(z)$ be a sequence of functions which are analytic in a region $R$ and which converge uniformly to a function $f(z) \not\equiv 0$ in every closed subregion of $R$. Let $\zeta$ be an interior point of $R$. If $\zeta$ is a limit point of the zeros of the $f_n(z)$, then $\zeta$ is a zero of $f(z)$. Conversely, if $\zeta$ is an $m$-fold zero of $f(z)$, then $f_n(z)$ has exactly $m$ zeros (counted with their multiplicities) in any sufficiently small neighborhood of $\zeta$ for all $n$ large enough.
+        </div>
+      </div>
+    </div>
+	<br>
+	<br>
+	So, the uniformity of the limit in <a href="#eq7.1" class="eqref">$(7.1)$</a> allows us to apply Hurwitz's theorem and conclude that if $w = w_0$ is any root of <div id="eqA.1">\[ 1 - \frac{e^{-w}}{(1-\xi)\sqrt{2\pi}} = 0, \tag{A.1} \]</div> then $p_{n-1}(nz_n(w))$ has a zero of the form \[ w = w_0 + \epsilon_n, \] where $\epsilon_n \to 0$ as $n \to \infty$. Or, stated a bit differently, we conclude that $p_{n-1}(nz)$ has a zero of the form \[ z = z_n(w_0 + \epsilon_n), \] and hence that $z \approx z_n(w_0)$ is a very good approximation when $n$ is large.<br>
+	<br>
+	For example, let's take $\xi = i/e$ (you can check that $i/e \in S$). Equation <a href="#eqA.1" class="eqref">$(A.1)$</a> then has a root at \[ w \approx -0.982403 + 0.352513i, \] so we expect that $p_{49}(50z)$ has a zero at approximately \[ \begin{align} z &\approx z_{50}(-0.982403 + 0.352513i) \\ &\approx -0.0221277 + 0.381359i. \end{align} \] Indeed, $p_{49}(50z)$ has a zero at \[ z \approx -0.0227486 + 0.380855i. \]<br>
+	<br>
+    <a href="#furtherreading" class="section" id="furtherreading">Appendix: Further reading</a> <br>
+    <br>
+    <br>
+    <sup class="citation" id="edrei">1</sup> The integral formula in <a
+      href="#problem1" class="bland">Problem 1</a> is a special case of
+    the one given on page 436 of the paper <i>The Padé table of
+      functions having a finite number of essential singularities</i> by
+    A. Edrei. [<a
+      href="https://msp.org/pjm/1975/56-2/pjm-v56-n2-p10-s.pdf">pdf</a>]
+    <br>
+    <br>
+    <sup class="citation" id="spmrefs">2</sup> Excellent references for
+    the saddle point method / the method of steepest descent are
+    Miller's <i>Applied Asymptotic Analysis</i> and de Bruijn's <i>Asymptotic
+
+      Methods in Analysis</i>. Each gives a different proof of the
+    method and both are worth reading for their complementary
+    perspectives. <br>
+    <br>
+    <sup class="citation" id="ek">3</sup> The paper <i>Eneström–Kakeya
+      Theorem and Some of Its Generalizations</i> by R. B. Gardner and
+    N. K. Govil contains some interesting historical information about
+    this result. [<a
+      href="https://faculty.etsu.edu/gardnerr/pubs/GardnerGovilF.pdf">pdf</a>]
+    <br>
+    <br>
+    <sup class="citation" id="szegoasymp">4</sup> The asymptotic formula
+    <a href="#eq5.1" class="eqref">$(5.1)$</a> was essentially originally
+    derived by Szegő in his 1924 paper <i>Über eine Eigenschaft der
+      Exponentialreihe</i>. An alternative derivation can be found in
+    the paper <i>Asymptotics for the zeros of the partial sums of
+      $e^z$. I.</i> by A. J. Carpenter, R. S. Varga, and J. Waldvogel. [<a
+      href="http://www.math.kent.edu/%7Evarga/pub/paper_184.pdf">pdf</a>]
+    <br>
+    <br>
+    <sup class="citation" id="esv">5</sup> The <a
+      href="#theorem" class="bland">main result</a> of this problem sequence was essentially
+    originally obtained by A. Edrei, E. B. Saff, and R. S. Varga in
+    their monograph <i>Zeros of Sections of Power Series</i>. I derived
+    a generalization of it in my paper <i>The Saff-Varga Width
+      Conjecture and entire functions with simple exponential growth</i>.
+    [<a
+      href="https://mathstat.dal.ca/%7Eantoniov/vargas-widthconjecture.pdf">pdf</a>].
+
+    <br>
+    <br>
+    <br>
+    <hr style="width: 100%; height: 2px;"><br>
+    <a href="http://mathstat.dal.ca/%7Eantoniov/">Antonio R. Vargas</a><br>
+    May 12, 2018<br>
+    <br>
+    <br>
+  </body>
+</html>

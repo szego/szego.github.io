@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>Map: Math and English Language Arts Proficiency in Oregon Public Schools - Antonio Vargas</title>
+    <link rel="stylesheet" type="text/css" href="math.css">
+    <link rel="stylesheet" type="text/css" href="body.css">
+    <link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+      crossorigin="">
+    <script src="jquery-3.3.1.slim.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA==" crossorigin="">
+	</script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full">
+	</script>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+    });
+	</script>
+    <style type="text/css">
+	body {
+		font-family:Georgia;
+		font-size:16px;
+	}
+
+	#mapid { height: 900px; }
+	
+	.info {
+		padding: 6px 8px;
+		font: 14px/16px Arial, Helvetica, sans-serif;
+		background: white;
+		background: rgba(255,255,255,0.8);
+		box-shadow: 0 0 15px rgba(0,0,0,0.2);
+		border-radius: 5px;
+	}
+	.info h4 {
+		margin: 0 0 5px;
+		color: #777;
+	}
+	
+	.legend {
+		line-height: 18px;
+		color: #555;
+	}
+	.legend i {
+		width: 18px;
+		height: 18px;
+		float: left;
+		margin-right: 8px;
+		opacity: 0.7;
+	}
+	</style>
+  </head>
+  <body style="margin: 25px auto; width: 900px;">
+    <a href="http://mathstat.dal.ca/%7Eantoniov/"><img
+        src="escher900.png" alt="back to main"></a><br>
+    <h2>Math and English Language Arts Proficiency in Oregon Public
+      Schools</h2>
+    <h3>Statewide assessment results from the 2018-2019 school year<br>
+    </h3>
+    These maps show, for each public school in Oregon, the percent of
+    students scoring at or above proficiency on the statewide
+    assessments administered during the 2018-2019 school year. You can
+    read more about the statewide assessments <a
+href="https://www.oregon.gov/ode/educator-resources/assessment/Pages/Statewide-Assessments.aspx">on
+
+      the Department of Education's website</a>.<br>
+    <br>
+    <a href="school_performance/math_ela_proficiency.png"><img
+        src="school_performance/math_ela_proficiency_small.png"
+        alt="Preview of the statewide assessment maps. Click to see the
+        maps in full resolution." width="900" height="343" border="0"></a><br>
+    <br>
+    In these maps a polygon is drawn around each school building and
+    colored according to the proportion its students who scored at or
+    above "proficiency" on the assessments. These polygons form a <a
+      href="https://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi
+      diagram</a> of Oregon's public schools.<br>
+    <h4>High resolution versions of these maps</h4>
+    <p>Click on the images below to see high resolution versions of the
+      maps. These allow you to zoom in and see more detail in densely
+      populated areas of the state.<br>
+    </p>
+    <p>The full resolution maps are each about 3.5 MB in size.<br>
+    </p>
+    <div align="center"><a
+        href="school_performance/math_proficiency.png"><img
+          src="school_performance/math_proficiency_small.png"
+          alt="Preview of the map of math proficiency scores. Click to
+          see the map in full resolution." width="700" height="484"
+          border="0"></a><br>
+      <br>
+      <a href="school_performance/ela_proficiency.png"><img
+          src="school_performance/ela_proficiency_small.png"
+          alt="Preview of the map for English language arts proficiency.
+          Click to see the map in full resolution." width="700"
+          height="484" border="0"></a><br>
+      <div align="left"><br>
+        These maps combine data from ODE (proficiency data), NCES
+        (school coordinates), ODOT (locations of highways, freeways, and
+        other signed routes), OWRD (locations of major bodies of water),
+        and the Oregon office of BLM (the outline of Oregon).<br>
+        <h3>How were these maps created?</h3>
+        <p>I made these maps using the R programming language. <a href="school_performance_writeup.html">Click
+          here</a> to read my writeup of the process. The writeup fully
+          details how to obtain the raw data and includes complete,
+          reusable source code for making other maps like these.<br>
+        </p>
+      </div>
+      <div align="left">
+        <h3>Motivation</h3>
+        <p>I created these because I wanted to see the geographic
+          distribution of math &amp; ELA proficiency scores for Oregon's
+          public schools. One way to do that would be to use the school
+          district scores and the <a
+            href="https://nces.ed.gov/programs/edge/Geographic/DistrictBoundaries">school
+
+            district boundaries from the NCES</a>, but I wanted to do
+          something to visualize the scores of individual schools.</p>
+        <h3>Acknowledgements</h3>
+        <p>I would like to thank <a
+            href="https://www.linkedin.com/in/amelia-vargas-39a45a144/">Amelia
+            L. Vargas</a> for her integral contributions. Every
+          conversation we had made this project better.<br>
+          <br>
+        </p>
+      </div>
+    </div>
+    <hr style="width: 100%; height: 2px;"><br>
+    <a href="http://mathstat.dal.ca/%7Eantoniov/">Antonio R. Vargas</a><br>
+    8 Dec 2019<br>
+    <br>
+    <br>
+  </body>
+</html>

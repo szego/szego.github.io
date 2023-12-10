@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Antonio R. Vargas" />
+
+
+<title>Accessing Portland Open ArcGIS Data from R</title>
+
+<script src="https://cdn.jsdelivr.net/gh/rstudio/rmarkdown@2.20/inst/rmd/h/pandoc/header-attrs.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://cdn.jsdelivr.net/gh/rstudio/rmarkdown@2.20/inst/rmd/h/bootstrap/css/readable.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/rstudio/rmarkdown@2.20/inst/rmd/h/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/rstudio/rmarkdown@2.20/inst/rmd/h/bootstrap/shim/html5shiv.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/rstudio/rmarkdown@2.20/inst/rmd/h/bootstrap/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="https://cdn.jsdelivr.net/gh/rstudio/rmarkdown@2.20/inst/rmd/h/navigation-1.1/tabsets.js"></script>
+<link href="https://cdn.jsdelivr.net/gh/rstudio/rmarkdown@2.20/inst/rmd/h/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/rstudio/rmarkdown@2.20/inst/rmd/h/pagedtable-1.1/js/pagedtable.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #204a87; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #8f5902; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #204a87; font-weight: bold; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #ce5c00; font-weight: bold; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Accessing Portland Open ArcGIS Data from
+R</h1>
+<h4 class="author">Antonio R. Vargas</h4>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#accessing-spatial-data"
+id="toc-accessing-spatial-data"><span
+class="toc-section-number">1</span> Accessing Spatial Data</a></li>
+<li><a href="#accessing-tables-of-data"
+id="toc-accessing-tables-of-data"><span
+class="toc-section-number">2</span> Accessing Tables of Data</a></li>
+</ul>
+</div>
+
+<p>Much of the <a href="https://gis-pdx.opendata.arcgis.com/">City of
+Portland’s open data</a> is hosted on ArcGIS Online. You can download
+the data directly from that site in a variety of formats (CSV, GeoJSON,
+etc.) if you’re just interested in accessing it once. But if you’d like
+to pull the data repeatedly as it updates, that can be cumbersome.</p>
+<p>The <a href="https://pfrater.github.io/arcpullr/">arcpullr</a>
+package can pull data from ArcGIS Online directly into R. In this article I'll use some features I've added to it that are only available in the development version of the package, so before running the code below you'll need to install it from GitHub by running the following line:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;pfrater/arcpullr&quot;</span>, <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><strong>Update July 29th, 2023:</strong> The <a href="https://cran.r-project.org/web/packages/arcpullr/">CRAN version of arcpullr</a> now includes these new features, so you can just install that instead of the version on GitHub.</p>
+<p>Here are the packages we’ll use in the examples:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">library</span>(arcpullr)</span></code></pre></div>
+<div id="accessing-spatial-data" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Accessing Spatial
+Data</h1>
+<p>Suppose you’ve already used the <a
+href="https://gis-pdx.opendata.arcgis.com/search?q=vulnerability">search
+engine on PortlandMaps Open Data</a> and decided you want the data from
+their <a
+href="https://gis-pdx.opendata.arcgis.com/datasets/PDX::vulnerability/explore">Economic
+Vulnerability Assessment</a>. You could download the data manually from
+there, but there is also a way to pull it into R by searching for the
+link to the data’s source.</p>
+<p>First, click the info icon on the left, then click View Full
+Details.</p>
+<p><img src="portland_open_arcgis_data_files/figure-html/full_details.png" /></p>
+<p>Then on the right side of that page, click View Data Source.</p>
+<p><img src="portland_open_arcgis_data_files/figure-html/view_data_source.png" /></p>
+<p>Copy the URL of that page.</p>
+<p>To pull the map data, pass that URL to
+<code>arcpullr::get_spatial_layer()</code>. The result is an
+<code>sf</code> object.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>vulnerability <span class="ot">&lt;-</span> <span class="fu">get_spatial_layer</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="st">&quot;https://www.portlandmaps.com/arcgis/rest/services/Public/COP_OpenData_PlanningDevelopment/MapServer/207&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>vulnerability <span class="sc">%&gt;%</span> </span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> vulnerability_score)) <span class="sc">+</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div>
+<p><img src="portland_open_arcgis_data_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+<div id="accessing-tables-of-data" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Accessing Tables of
+Data</h1>
+<p>Now suppose you’ve used the PortlandMaps search engine and decided
+you want the <a
+href="https://gis-pdx.opendata.arcgis.com/datasets/PDX::individual-recipients-rescue-plan-data-standards/explore">demographic
+dataset of individual recipients served by City of Portland Rescue Plan
+projects</a>.</p>
+<p>Just as above, navigate to the View Data Source button and copy its
+destination URL.</p>
+<p>To pull the table, pass that URL to
+<code>arcpullr::get_table_layer()</code>. The result is a data
+frame.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>prp_individual <span class="ot">&lt;-</span> <span class="fu">get_table_layer</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="st">&quot;https://www.portlandmaps.com/arcgis/rest/services/Public/COP_OpenData_ARPA/MapServer/1352&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">head =</span> <span class="dv">30</span>  <span class="co"># just the first 30 records, to illustrate</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>prp_individual</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["OBJECTID"],"name":[1],"type":["int"],"align":["right"]},{"label":["subproject_id"],"name":[2],"type":["int"],"align":["right"]},{"label":["reporting_period_id"],"name":[3],"type":["int"],"align":["right"]},{"label":["race_ethnicity_optional"],"name":[4],"type":["chr"],"align":["left"]},{"label":["zip_code"],"name":[5],"type":["chr"],"align":["left"]},{"label":["race_ethnicity_undisclosed"],"name":[6],"type":["int"],"align":["right"]},{"label":["gender_optional"],"name":[7],"type":["chr"],"align":["left"]},{"label":["gender_undisclosed"],"name":[8],"type":["int"],"align":["right"]},{"label":["income_id"],"name":[9],"type":["int"],"align":["right"]},{"label":["income_undisclosed"],"name":[10],"type":["int"],"align":["right"]},{"label":["hh_size"],"name":[11],"type":["int"],"align":["right"]},{"label":["birth_year"],"name":[12],"type":["int"],"align":["right"]},{"label":["calculated_age"],"name":[13],"type":["int"],"align":["right"]},{"label":["disability_id"],"name":[14],"type":["int"],"align":["right"]},{"label":["disability_undisclosed"],"name":[15],"type":["int"],"align":["right"]},{"label":["assets"],"name":[16],"type":["lgl"],"align":["right"]},{"label":["weeks_of_hardship"],"name":[17],"type":["lgl"],"align":["right"]},{"label":["job_industry"],"name":[18],"type":["lgl"],"align":["right"]},{"label":["housing_type"],"name":[19],"type":["lgl"],"align":["right"]},{"label":["narrative_data"],"name":[20],"type":["lgl"],"align":["right"]},{"label":["hh_size_undisclosed"],"name":[21],"type":["int"],"align":["right"]},{"label":["age_undisclosed"],"name":[22],"type":["int"],"align":["right"]},{"label":["entered_middle_income_career"],"name":[23],"type":["lgl"],"align":["right"]},{"label":["id"],"name":[24],"type":["int"],"align":["right"]}],"data":[{"1":"1","2":"1","3":"4","4":"NA","5":"97217","6":"0","7":"NA","8":"0","9":"2","10":"0","11":"3","12":"1991","13":"32","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"1"},{"1":"2","2":"1","3":"4","4":"NA","5":"97211","6":"0","7":"Gender non-conforming woman","8":"0","9":"2","10":"0","11":"3","12":"1995","13":"28","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"2"},{"1":"3","2":"1","3":"4","4":"NA","5":"97216","6":"0","7":"NA","8":"0","9":"7","10":"0","11":"1","12":"1992","13":"31","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"3"},{"1":"4","2":"1","3":"4","4":"NA","5":"97236","6":"0","7":"NA","8":"0","9":"5","10":"0","11":"3","12":"1989","13":"34","14":"3","15":"1","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"4"},{"1":"5","2":"1","3":"4","4":"NA","5":"98662","6":"0","7":"NA","8":"0","9":"7","10":"0","11":"6","12":"1985","13":"38","14":"1","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"5"},{"1":"6","2":"1","3":"4","4":"NA","5":"97218","6":"0","7":"NA","8":"0","9":"6","10":"0","11":"4","12":"1984","13":"39","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"6"},{"1":"7","2":"1","3":"4","4":"Mestiza","5":"97213","6":"0","7":"NA","8":"0","9":"5","10":"0","11":"2","12":"1982","13":"41","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"7"},{"1":"8","2":"1","3":"4","4":"NA","5":"97220","6":"0","7":"NA","8":"0","9":"1","10":"0","11":"4","12":"1973","13":"50","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"8"},{"1":"9","2":"1","3":"4","4":"NA","5":"97206","6":"0","7":"NA","8":"0","9":"4","10":"0","11":"2","12":"1979","13":"44","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"9"},{"1":"10","2":"1","3":"4","4":"NA","5":"97086","6":"0","7":"NA","8":"0","9":"6","10":"0","11":"3","12":"1988","13":"35","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"10"},{"1":"11","2":"1","3":"4","4":"NA","5":"97266","6":"0","7":"NA","8":"0","9":"9","10":"0","11":"5","12":"1981","13":"42","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"11"},{"1":"12","2":"1","3":"4","4":"NA","5":"97206","6":"0","7":"NA","8":"0","9":"2","10":"0","11":"0","12":"1989","13":"34","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"12"},{"1":"13","2":"1","3":"4","4":"NA","5":"97203","6":"0","7":"NA","8":"0","9":"5","10":"0","11":"5","12":"1986","13":"37","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"13"},{"1":"14","2":"1","3":"4","4":"NA","5":"97214","6":"0","7":"NA","8":"0","9":"7","10":"0","11":"2","12":"1992","13":"31","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"14"},{"1":"15","2":"1","3":"4","4":"NA","5":"97323","6":"0","7":"NA","8":"0","9":"10","10":"1","11":"1","12":"1996","13":"27","14":"3","15":"1","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"15"},{"1":"16","2":"1","3":"4","4":"NA","5":"97213","6":"0","7":"NA","8":"0","9":"7","10":"0","11":"2","12":"1985","13":"38","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"16"},{"1":"17","2":"1","3":"4","4":"NA","5":"97222","6":"0","7":"NA","8":"0","9":"1","10":"0","11":"1","12":"1976","13":"47","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"17"},{"1":"18","2":"1","3":"4","4":"NA","5":"97232","6":"0","7":"NA","8":"0","9":"6","10":"0","11":"3","12":"1979","13":"44","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"18"},{"1":"19","2":"1","3":"4","4":"NA","5":"97203","6":"0","7":"NA","8":"0","9":"6","10":"0","11":"2","12":"1976","13":"47","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"19"},{"1":"20","2":"1","3":"4","4":"NA","5":"97212","6":"0","7":"NA","8":"0","9":"6","10":"0","11":"1","12":"1988","13":"35","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"20"},{"1":"21","2":"1","3":"4","4":"NA","5":"97202","6":"0","7":"NA","8":"0","9":"5","10":"0","11":"2","12":"1982","13":"41","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"21"},{"1":"22","2":"1","3":"4","4":"NA","5":"97266","6":"0","7":"NA","8":"NA","9":"5","10":"0","11":"2","12":"1977","13":"46","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"22"},{"1":"23","2":"1","3":"4","4":"NA","5":"97211","6":"0","7":"NA","8":"0","9":"2","10":"0","11":"3","12":"1974","13":"49","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"23"},{"1":"24","2":"1","3":"4","4":"NA","5":"97214","6":"0","7":"NA","8":"0","9":"2","10":"0","11":"1","12":"1995","13":"28","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"24"},{"1":"25","2":"1","3":"4","4":"NA","5":"97217","6":"0","7":"NA","8":"0","9":"1","10":"0","11":"2","12":"1973","13":"50","14":"1","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"25"},{"1":"26","2":"15","3":"3","4":"NA","5":"97217","6":"0","7":"NA","8":"0","9":"3","10":"0","11":"6","12":"1986","13":"36","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"26"},{"1":"27","2":"15","3":"3","4":"Somali African","5":"97236","6":"0","7":"NA","8":"0","9":"4","10":"0","11":"7","12":"1973","13":"49","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"27"},{"1":"28","2":"15","3":"3","4":"NA","5":"97266","6":"0","7":"NA","8":"0","9":"1","10":"0","11":"2","12":"1967","13":"55","14":"2","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"28"},{"1":"29","2":"15","3":"3","4":"NA","5":"97266","6":"1","7":"NA","8":"0","9":"3","10":"0","11":"7","12":"1983","13":"39","14":"1","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"29"},{"1":"30","2":"15","3":"3","4":"NA","5":"97266","6":"0","7":"NA","8":"0","9":"3","10":"0","11":"8","12":"1982","13":"40","14":"1","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"0","22":"0","23":"NA","24":"30"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>That’s all. Enjoy!</p>
+<hr />
+<p><a href="https://mathstat.dal.ca/~antoniov/">Antonio R.
+Vargas</a></p>
+<p>6 March 2023</p>
+<script type="text/javascript">
+// This is javascript to make the headers go back to the TOC when clicked. 
+$('h1,h2,h3').click(function(){
+window.scrollTo(0, 0);
+window.location.hash="";
+});
+</script>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

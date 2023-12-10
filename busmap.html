@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>Map: Access to frequent bus routes versus population density in Salem, Oregon - Antonio Vargas</title>
+	<link rel="stylesheet" type="text/css" href="math.css">
+	<link rel="stylesheet" type="text/css" href="body.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+		integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+		crossorigin=""/>
+	<script src="jquery-3.3.1.slim.min.js"></script>
+	<script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+		integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+		crossorigin="">
+	</script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full">
+	</script>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+    });
+	</script>
+	<style type="text/css">
+	body {
+		font-family:Georgia;
+		font-size:16px;
+	}
+
+	#mapid { height: 900px; }
+	
+	.info {
+		padding: 6px 8px;
+		font: 14px/16px Arial, Helvetica, sans-serif;
+		background: white;
+		background: rgba(255,255,255,0.8);
+		box-shadow: 0 0 15px rgba(0,0,0,0.2);
+		border-radius: 5px;
+	}
+	.info h4 {
+		margin: 0 0 5px;
+		color: #777;
+	}
+	
+	.legend {
+		line-height: 18px;
+		color: #555;
+	}
+	.legend i {
+		width: 18px;
+		height: 18px;
+		float: left;
+		margin-right: 8px;
+		opacity: 0.7;
+	}
+	</style>
+  </head>
+  <body style="margin: 25px auto; width: 900px;">
+    <a href="http://mathstat.dal.ca/%7Eantoniov/"><img src="escher900.png" alt="back to main"></a><br>
+    <h2>Access to frequent bus routes versus population density in Salem, Oregon</h2>
+    
+    The book <em>Trains, Buses, People</em> by Christof Spieler has <a href="https://www.trainsbusespeople.org/maps/">some awesome maps</a> of cities across the US showing the availability of transit to their populations. It includes maps for Portland and Eugene so I wanted to make one for Salem too.<br>
+	<br>
+	This map highlights areas which are within a quarter mile and a half mile of a bus stop served by a frequent (every 15 minutes) bus route. Spieler chooses the 15 minute cutoff because "at that level of service, a passenger can just show up to a station without consulting a schedule." It includes population density, with redder areas being more dense, so we can see whether dense areas are being served by the buses.<br>
+	<br>
+	The half mile and quarter mile zones can be toggled using the button in the top right of the map.<br>
+	<br>
+	<div id="mapid"></div>
+	<script type="text/javascript" src="busmap/quartermile_zone.geojson"></script>
+	<script type="text/javascript" src="busmap/halfmile_zone.geojson"></script>
+	<script type="text/javascript" src="busmap/marion_polk_blockgroups.geojson"></script>
+	<script>
+	var map = L.map('mapid').setView([44.945, -123.015], 12);
+
+	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
+    tileSize: 512,
+    maxZoom: 18,
+    zoomOffset: -1,
+    id: 'mapbox/streets-v11',
+    accessToken: 'pk.eyJ1Ijoic3plZ28iLCJhIjoiY2pwbWFidmwzMG1xajN4cWx3bDF0OTlkeSJ9.ACFvGDgdW84LfDuWs8MuzQ'
+	}).addTo(map);
+	
+	var blocks_gjson;
+	var halfmile_gjson;
+	var quartermile_gjson;
+	
+	var info = L.control();
+
+	info.onAdd = function (map) {
+		this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+		this.update();
+		return this._div;
+	};
+
+	// method that we will use to update the control based on feature properties passed
+	info.update = function (props) {
+		this._div.innerHTML = '<h4>Population Density</h4>' +  (props ?
+			'<b>Census tract ' + props.TRACTCE + ', block group ' + props.BLKGRPCE + '</b><br />' + props.density + ' people / mi<sup>2</sup>'
+			: 'Hover over a census block group');
+	};
+
+	info.addTo(map);
+	
+	// get color depending on population density value
+	function getColor(d) {
+		return d > 14400  ? '#CE0029' :
+				d > 12800 ? '#DD2F34' :
+				d > 11200 ? '#EC5E3F' :
+				d > 9600  ? '#FB8D4A' :
+				d > 8000  ? '#FEB463' :
+				d > 6400  ? '#FED980' :
+				d > 4800  ? '#FEFF9C' :
+				d > 3200  ? '#FFFFBD' :
+				d > 1600  ? '#FFFFDE' :
+							'#FFF';
+	}
+	
+	function getOpacity(d) {
+		return d > 1600 ? 0.7 : 0;
+	}
+
+	function bg_style(feature) {
+		return {
+			weight: 0,
+			opacity: 1,
+			color: 'white',
+			dashArray: '3',
+			fillOpacity: getOpacity(feature.properties.density),
+			fillColor: getColor(feature.properties.density)
+		};
+	}
+	
+	function halfmile_style(feature) {
+		return {
+			weight: 1,
+			opacity: 1,
+			color: 'black',
+			fillOpacity: 0.25,
+			fillColor: 'black'
+		};
+	}
+	
+	function quartermile_style(feature) {
+		return {
+			weight: 1,
+			opacity: 1,
+			color: 'black',
+			dashArray: '3',
+			fillOpacity: 0.25,
+			fillColor: 'black'
+		};
+	}
+	
+	function highlightFeature(e) {
+		var layer = e.target;
+
+		layer.setStyle({
+			weight: 2,
+			color: '#666',
+			dashArray: '',
+			fillOpacity: 0.7
+		});
+		
+		info.update(layer.feature.properties);
+	}
+	
+	function resetHighlight(e) {
+		blocks_gjson.resetStyle(e.target);
+		info.update();
+	}
+	
+	function zoomToFeature(e) {
+		map.fitBounds(e.target.getBounds());
+	}
+	
+	function onEachFeature(feature, layer) {
+		layer.on({
+			mouseover: highlightFeature,
+			mouseout: resetHighlight,
+			click: zoomToFeature
+		});
+	}
+	
+	var blocks_gjson = L.geoJson(mpbgs, {
+		style: bg_style,
+		onEachFeature: onEachFeature
+	}).addTo(map);
+	
+	var quartermile_gjson = L.geoJson(quartermile, {style: quartermile_style}).addTo(map);
+	var halfmile_gjson = L.geoJson(halfmile, {style: halfmile_style})
+	
+	var legend = L.control({position: 'bottomright'});
+
+	legend.onAdd = function (map) {
+
+		var div = L.DomUtil.create('div', 'info legend'),
+			grades = [1600, 3200, 4800, 6400, 8000, 9600, 11200, 12800, 14400],
+			labels = [];
+
+		// loop through our density intervals and generate a label with a colored square for each interval
+		for (var i = 0; i < grades.length; i++) {
+			div.innerHTML +=
+				'<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+				grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+		}
+
+		return div;
+	};
+
+	legend.addTo(map);
+	
+	var overlays = {
+		"1/4 mile of a frequent bus stop": quartermile_gjson,
+		"1/2 mile of a frequent bus stop": halfmile_gjson
+	};
+	
+	L.control.layers(null, overlays).addTo(map);
+	
+	$("#mapid").height(Math.min($(window).height() - 20, 950));
+	</script>
+    <br>
+	<hr style="width: 100%; height: 2px;"><br>
+	<strong>Data:</strong><br>
+	<br>
+	Population data by census block group from the U.S. Census Bureau, 2016 American Community Survey 5-Year Estimates<br>
+	<a href="https://factfinder.census.gov/faces/nav/jsf/pages/index.xhtml">https://factfinder.census.gov/faces/nav/jsf/pages/index.xhtml</a><br>
+	<br>
+	Lists of bus stops with frequent service from Cherriots<br>
+	<a href="https://www.cherriots.org/services/">https://www.cherriots.org/services/</a><br>
+	<br>
+	<strong>Building the map itself:</strong><br>
+	<br>
+	Bus stop locations from Cherriots<br>
+	<a href="https://www.cherriots.org/data/">https://www.cherriots.org/data/</a><br>
+	<br>
+	Oregon census block group shapefiles from the U.S. Census Bureau<br>
+	<a href="https://www.census.gov/geo/maps-data/data/cbf/cbf_blkgrp.html">https://www.census.gov/geo/maps-data/data/cbf/cbf_blkgrp.html</a><br>
+	<br>
+	I used <a href="https://www.qgis.org/en/site/">QGIS</a> to merge the shapefiles with the data and generate the geometry for the quarter-mile and half-mile regions. Each layer was exported as a geopackage, then converted to GeoJSON using <a href="http://ngageoint.github.io/geopackage-js/jsdoc/index.html">GeoPackage JS</a> (on <a href="http://ngageoint.github.io/geopackage-js/">this page</a>). The final map was built in JavaScript using <a href="https://leafletjs.com/">Leaflet</a>.<br>
+	<br>
+    <hr style="width: 100%; height: 2px;"><br>
+	I originally made this map as a rasterized image exported from QGIS,<br>
+	<br>
+	<a href="busmap/density_bus.png"><img src="busmap/density_bus_preview.png" alt="raster map" class="center"></a><br>
+	which I <a href="https://www.reddit.com/r/SALEM/comments/a54x8j/map_access_to_frequent_bus_routes_versus/">posted on reddit</a>.<br>
+	<br>
+    <hr style="width: 100%; height: 2px;"><br>
+    <a href="http://mathstat.dal.ca/%7Eantoniov/">Antonio R. Vargas</a><br>
+    12 Dec 2018<br>
+    <br>
+    <br>
+  </body>
+</html>

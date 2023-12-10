@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Antonio R. Vargas" />
+
+
+<title>Spatial analysis of Oregon school district graduation rates using INLA and Stan</title>
+
+<script src="https://cdn.jsdelivr.net/gh/rstudio/rmarkdown@2.13/inst/rmd/h/pandoc/header-attrs.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://cdn.jsdelivr.net/gh/rstudio/rmarkdown@2.13/inst/rmd/h/bootstrap/css/readable.min.css" rel="stylesheet" />
+<script src="https://unpkg.com/bootstrap@3.3.5/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/rstudio/rmarkdown@2.13/inst/rmd/h/bootstrap/shim/html5shiv.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/rstudio/rmarkdown@2.13/inst/rmd/h/bootstrap/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="spatial_grad_rates_files/navigation-1.1/tabsets.js"></script>
+<link href="spatial_grad_rates_files/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="spatial_grad_rates_files/pagedtable-1.1/js/pagedtable.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Spatial analysis of Oregon school district graduation rates using INLA and Stan</h1>
+<h4 class="author">Antonio R. Vargas</h4>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#loading-district-geometry-and-graduation-data"><span class="toc-section-number">1</span> Loading district geometry and graduation data</a></li>
+<li><a href="#spatial-analysis-using-inla"><span class="toc-section-number">2</span> Spatial analysis using INLA</a></li>
+<li><a href="#theory-behind-the-bym-and-bym2-models"><span class="toc-section-number">3</span> Theory behind the BYM and BYM2 models</a></li>
+<li><a href="#reimplementing-the-bym2-model-in-stan"><span class="toc-section-number">4</span> Reimplementing the BYM2 model in Stan</a></li>
+</ul>
+</div>
+
+<p>Since school districts in Oregon cover geographic areas, I wondered whether their performance metrics have any spatial correlation. Do school districts near each other tend to have similar graduation rates, for instance?</p>
+<p>Surely there is more to a school’s performance than its location. There are, unfortunately, going to be districts right next to each other that have very different metrics. If we were to fit a model that just did some spatial smoothing of the data, it would never expect that sort of thing. So, we want a model that also allows for non-spatial variation.</p>
+<p>We’ll analyze Oregon school district graduation rates using a model called the Besag-York-Mollié (BYM) model that measures both spatial and non-spatial variation. We will use this model to estimate the ‘latent’ graduation rate for each district - a theoretical measure of that district’s performance that is hopefully less sensitive to the individual students in the graduating cohort and more predictive of future graduation rates.</p>
+<p>One interesting side-effect of the analysis is that we will obtain graduation rate predictions for school districts that didn’t have any students this past year. Since the model includes spatial correlation, these missing districts will get slightly different predictions depending on the graduation rates of their non-missing neighboring districts.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># data processing</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(openxlsx)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># processing spatial data</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># spatial analysis</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spdep)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(INLA)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cmdstanr)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(posterior)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># for retrieving district geometry</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidycensus)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot2 theme</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_classic</span>())</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">tigris_use_cache =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div id="loading-district-geometry-and-graduation-data" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Loading district geometry and graduation data</h1>
+<p>We will retrieve the district geometry using <a href="https://walker-data.com/tidycensus/">tidycensus</a> and the graduation rates from the Oregon Department of Education’s website.</p>
+<p>First we use <code>tidycensus::get_acs()</code> to get school district boundaries. The geometries are separated into two different types, unified and elementary, which we fetch separately then bind together.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>geogs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;school district (unified)&quot;</span>, <span class="st">&quot;school district (elementary)&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>.retrieved_geometries <span class="ot">&lt;-</span> <span class="fu">lapply</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  geogs,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  get_acs,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">variables =</span> <span class="fu">c</span>(<span class="at">total =</span> <span class="st">&quot;DP02_0058&quot;</span>),  <span class="co"># not used in the analysis</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">state =</span> <span class="dv">41</span>,  <span class="co"># Oregon</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> <span class="dv">2020</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">moe_level =</span> <span class="dv">95</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">survey =</span> <span class="st">&quot;acs5&quot;</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">geometry =</span> <span class="cn">TRUE</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>or <span class="ot">&lt;-</span> </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do.call</span>(rbind, .retrieved_geometries) <span class="sc">%&gt;%</span>  <span class="co"># bind &quot;unified&quot; and &quot;elementary&quot; districts</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    NAME <span class="sc">!=</span> <span class="st">&quot;Remainder of Oregon, Oregon&quot;</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    NAME <span class="sc">!=</span> <span class="st">&quot;School District Not Defined, Oregon&quot;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(  <span class="co"># Clean up district names to match NCES names</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">NAME =</span> </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>      NAME <span class="sc">%&gt;%</span> </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_remove</span>(<span class="st">&quot; </span><span class="sc">\\</span><span class="st">(.*</span><span class="sc">\\</span><span class="st">)&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_remove</span>(<span class="st">&quot;, Oregon&quot;</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="dv">2992</span>) <span class="sc">%&gt;%</span>  <span class="co"># use Oregon Lambert projection</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(variable, estimate, moe))</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(or)</span></code></pre></div>
+<pre><code>## Rows: 196
+## Columns: 3
+## $ GEOID    &lt;chr&gt; &quot;4101120&quot;, &quot;4101200&quot;, &quot;4106740&quot;, &quot;4100023&quot;, &quot;4104740&quot;, &quot;41129~
+## $ NAME     &lt;chr&gt; &quot;Greater Albany School District 8J&quot;, &quot;Alsea School District 7~
+## $ geometry &lt;MULTIPOLYGON [ft]&gt; MULTIPOLYGON (((601230.6 10..., MULTIPOLYGON ((~</code></pre>
+<p>A quick plot of the districts:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>or <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>()</span></code></pre></div>
+<p><img src="spatial_grad_rates_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>Next we’ll download <a href="https://www.oregon.gov/ode/reports-and-data/students/Pages/Cohort-Graduation-Rate.aspx">ODE’s graduation data</a> and join it to the geometry above. We’ll also need a key I made a while back that matches the district names ODE uses with the names used by the district geometries above.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># NCES district names matched with ODE district names</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;https://mathstat.dal.ca/~antoniov/districts_homelessness/nces_and_ode_sd_names.csv&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;nces_and_ode_sd_names.csv&quot;</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">mode =</span> <span class="st">&quot;wb&quot;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Oregon graduation report 2020-2021</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;https://www.oregon.gov/ode/reports-and-data/students/Documents/cohortmediafile2020-2021.xlsx&quot;</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;cohortmediafile2020-2021.xlsx&quot;</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">mode =</span> <span class="st">&quot;wb&quot;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Here we read and process the downloaded files then join them to the district geometries.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ode_sd_name_key <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;nces_and_ode_sd_names.csv&quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>grad <span class="ot">&lt;-</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read.xlsx</span>(</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;cohortmediafile2020-2021.xlsx&quot;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">sheet =</span> <span class="st">&quot;4YR District and School&quot;</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">na.strings =</span> <span class="fu">c</span>(<span class="st">&quot;*&quot;</span>, <span class="st">&quot;—&quot;</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    Student.Group.Code <span class="sc">==</span> <span class="st">&quot;Tot&quot;</span>,  <span class="co"># &#39;all students&#39; group</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    Institution.Level <span class="sc">==</span> <span class="st">&quot;District&quot;</span>,  <span class="co"># district level grad rates</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    District.Name <span class="sc">!=</span> <span class="st">&quot;ODE YCEP District&quot;</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(  <span class="co"># pick out necessary columns</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">district =</span> District.Name,</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">cohort =</span> Adjusted.Cohort,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">grads =</span> Graduates,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">grad_rate =</span> <span class="st">`</span><span class="at">2020-21.Four-year.Cohort.Graduation.Rate</span><span class="st">`</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">vars</span>(cohort, grads), as.integer) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">grad_rate =</span> <span class="fu">round</span>(<span class="fu">as.numeric</span>(grad_rate), <span class="dv">2</span>),</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">grad_rate =</span> <span class="fu">if_else</span>(  <span class="co"># fix some missing values</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(grad_rate) <span class="sc">&amp;</span> cohort <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>      grads<span class="sc">/</span>cohort,</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>      grad_rate</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(ode_sd_name_key, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;district&quot;</span> <span class="ot">=</span> <span class="st">&quot;ODE&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(NCES, cohort, grads, grad_rate)</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>or_grad <span class="ot">&lt;-</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>  or <span class="sc">%&gt;%</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(grad, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;NAME&quot;</span> <span class="ot">=</span> <span class="st">&quot;NCES&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(NAME <span class="sc">!=</span> <span class="st">&quot;McDermitt School District 51&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">idarea =</span> <span class="fu">row_number</span>())  <span class="co"># create a district id column</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>or_grad</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["GEOID"],"name":[1],"type":["chr"],"align":["left"]},{"label":["NAME"],"name":[2],"type":["chr"],"align":["left"]},{"label":["cohort"],"name":[3],"type":["int"],"align":["right"]},{"label":["grads"],"name":[4],"type":["int"],"align":["right"]},{"label":["grad_rate"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["geometry"],"name":[6],"type":["s_GEOMET"],"align":["right"]},{"label":["idarea"],"name":[7],"type":["int"],"align":["right"]}],"data":[{"1":"4101120","2":"Greater Albany School District 8J","3":"736","4":"588","5":"79.89","6":"<s_GEOMET>","7":"1","_rn_":"1"},{"1":"4101200","2":"Alsea School District 7J","3":"38","4":"18","5":"47.37","6":"<s_GEOMET>","7":"2","_rn_":"2"},{"1":"4106740","2":"Jefferson County School District 509J","3":"211","4":"179","5":"84.83","6":"<s_GEOMET>","7":"3","_rn_":"3"},{"1":"4100023","2":"Hillsboro School District 1J","3":"1551","4":"1282","5":"82.66","6":"<s_GEOMET>","7":"4","_rn_":"4"},{"1":"4104740","2":"Eugene School District 4J","3":"1491","4":"1175","5":"78.81","6":"<s_GEOMET>","7":"5","_rn_":"5"},{"1":"4112930","2":"Vernonia School District 47J","3":"41","4":"30","5":"73.17","6":"<s_GEOMET>","7":"6","_rn_":"6"},{"1":"4104020","2":"Dayville School District 16J","3":"5","4":"5","5":"100.00","6":"<s_GEOMET>","7":"7","_rn_":"7"},{"1":"4101710","2":"Baker School District 5J","3":"511","4":"398","5":"77.89","6":"<s_GEOMET>","7":"8","_rn_":"8"},{"1":"4102840","2":"Central School District 13J","3":"233","4":"199","5":"85.41","6":"<s_GEOMET>","7":"9","_rn_":"9"},{"1":"4107980","2":"McKenzie School District 68","3":"13","4":"9","5":"69.23","6":"<s_GEOMET>","7":"10","_rn_":"10"},{"1":"4103480","2":"Corvallis School District 509J","3":"560","4":"494","5":"88.21","6":"<s_GEOMET>","7":"11","_rn_":"11"},{"1":"4110110","2":"Prairie City School District 4","3":"16","4":"15","5":"93.75","6":"<s_GEOMET>","7":"12","_rn_":"12"},{"1":"4101980","2":"Bend-La Pine Administrative School District 1","3":"1485","4":"1223","5":"82.36","6":"<s_GEOMET>","7":"13","_rn_":"13"},{"1":"4110350","2":"Redmond School District 2J","3":"679","4":"580","5":"85.42","6":"<s_GEOMET>","7":"14","_rn_":"14"},{"1":"4106900","2":"Three Rivers School District","3":"350","4":"270","5":"77.14","6":"<s_GEOMET>","7":"15","_rn_":"15"},{"1":"4100990","2":"Adel School District 21","3":"1","4":"1","5":"100.00","6":"<s_GEOMET>","7":"16","_rn_":"16"},{"1":"4104500","2":"Eagle Point School District 9","3":"316","4":"255","5":"80.70","6":"<s_GEOMET>","7":"17","_rn_":"17"},{"1":"4110040","2":"Portland School District 1J","3":"3503","4":"2955","5":"84.36","6":"<s_GEOMET>","7":"18","_rn_":"18"},{"1":"4102490","2":"Harney County School District 3","3":"50","4":"43","5":"86.00","6":"<s_GEOMET>","7":"19","_rn_":"19"},{"1":"4105760","2":"Central Curry School District 1","3":"44","4":"34","5":"77.27","6":"<s_GEOMET>","7":"20","_rn_":"20"},{"1":"4105670","2":"Glide School District 12","3":"54","4":"49","5":"90.74","6":"<s_GEOMET>","7":"21","_rn_":"21"},{"1":"4101740","2":"Burnt River School District 30J","3":"7","4":"5","5":"71.43","6":"<s_GEOMET>","7":"22","_rn_":"22"},{"1":"4102310","2":"Brookings-Harbor School District 17","3":"122","4":"95","5":"77.87","6":"<s_GEOMET>","7":"23","_rn_":"23"},{"1":"4110530","2":"Riddle School District 70","3":"24","4":"14","5":"58.33","6":"<s_GEOMET>","7":"24","_rn_":"24"},{"1":"4112990","2":"Wallowa School District 12","3":"20","4":"18","5":"90.00","6":"<s_GEOMET>","7":"25","_rn_":"25"},{"1":"4100021","2":"South Wasco County School District 1","3":"21","4":"19","5":"90.48","6":"<s_GEOMET>","7":"26","_rn_":"26"},{"1":"4108010","2":"McMinnville School District 40","3":"516","4":"478","5":"92.64","6":"<s_GEOMET>","7":"27","_rn_":"27"},{"1":"4105080","2":"Enterprise School District 21","3":"23","4":"22","5":"95.65","6":"<s_GEOMET>","7":"28","_rn_":"28"},{"1":"4108460","2":"Monument School District 8","3":"7","4":"7","5":"100.00","6":"<s_GEOMET>","7":"29","_rn_":"29"},{"1":"4102640","2":"Canby School District 86","3":"355","4":"283","5":"79.72","6":"<s_GEOMET>","7":"30","_rn_":"30"},{"1":"4104700","2":"Estacada School District 108","3":"417","4":"364","5":"87.29","6":"<s_GEOMET>","7":"31","_rn_":"31"},{"1":"4109330","2":"Oregon City School District 62","3":"629","4":"548","5":"87.12","6":"<s_GEOMET>","7":"32","_rn_":"32"},{"1":"4106820","2":"Jordan Valley School District 3","3":"6","4":"6","5":"100.00","6":"<s_GEOMET>","7":"33","_rn_":"33"},{"1":"4109480","2":"Parkrose School District 3","3":"297","4":"216","5":"72.73","6":"<s_GEOMET>","7":"34","_rn_":"34"},{"1":"4107500","2":"Lincoln County School District","3":"441","4":"255","5":"57.82","6":"<s_GEOMET>","7":"35","_rn_":"35"},{"1":"4109150","2":"Oakridge School District 76","3":"42","4":"31","5":"73.81","6":"<s_GEOMET>","7":"36","_rn_":"36"},{"1":"4110820","2":"Salem-Keizer School District 24J","3":"3237","4":"2619","5":"80.91","6":"<s_GEOMET>","7":"37","_rn_":"37"},{"1":"4111790","2":"Stanfield School District 61","3":"38","4":"35","5":"92.11","6":"<s_GEOMET>","7":"38","_rn_":"38"},{"1":"4103840","2":"Culver School District 4","3":"49","4":"45","5":"91.84","6":"<s_GEOMET>","7":"39","_rn_":"39"},{"1":"4111450","2":"Silver Falls School District 4J","3":"350","4":"324","5":"92.57","6":"<s_GEOMET>","7":"40","_rn_":"40"},{"1":"4108310","2":"Molalla River School District 35","3":"187","4":"163","5":"87.17","6":"<s_GEOMET>","7":"41","_rn_":"41"},{"1":"4104410","2":"Dufur School District 29","3":"28","4":"25","5":"89.29","6":"<s_GEOMET>","7":"42","_rn_":"42"},{"1":"4110890","2":"Oregon Trail School District 46","3":"348","4":"307","5":"88.22","6":"<s_GEOMET>","7":"43","_rn_":"43"},{"1":"4103860","2":"Dallas School District 2","3":"232","4":"188","5":"81.03","6":"<s_GEOMET>","7":"44","_rn_":"44"},{"1":"4111250","2":"Sherman School District 1","3":"13","4":"12","5":"92.31","6":"<s_GEOMET>","7":"45","_rn_":"45"},{"1":"4112540","2":"Ukiah School District 80","3":"2","4":"2","5":"100.00","6":"<s_GEOMET>","7":"46","_rn_":"46"},{"1":"4101470","2":"Arlington School District 3","3":"13","4":"10","5":"76.92","6":"<s_GEOMET>","7":"47","_rn_":"47"},{"1":"4107020","2":"Klamath County School District","3":"468","4":"365","5":"77.99","6":"<s_GEOMET>","7":"48","_rn_":"48"},{"1":"4106870","2":"Joseph School District 6","3":"24","4":"22","5":"91.67","6":"<s_GEOMET>","7":"49","_rn_":"49"},{"1":"4112360","2":"Troy School District 54","3":"0","4":"0","5":"NA","6":"<s_GEOMET>","7":"50","_rn_":"50"},{"1":"4109000","2":"Nyssa School District 26","3":"88","4":"77","5":"87.50","6":"<s_GEOMET>","7":"51","_rn_":"51"},{"1":"4109750","2":"Pinehurst School District 94","3":"0","4":"0","5":"NA","6":"<s_GEOMET>","7":"52","_rn_":"52"},{"1":"4109430","2":"Paisley School District 11","3":"7","4":"6","5":"85.71","6":"<s_GEOMET>","7":"53","_rn_":"53"},{"1":"4111970","2":"Sweet Home School District 55","3":"159","4":"131","5":"82.39","6":"<s_GEOMET>","7":"54","_rn_":"54"},{"1":"4110560","2":"Riverdale School District 51J","3":"64","4":"60","5":"93.75","6":"<s_GEOMET>","7":"55","_rn_":"55"},{"1":"4110080","2":"Powers School District 31","3":"6","4":"3","5":"50.00","6":"<s_GEOMET>","7":"56","_rn_":"56"},{"1":"4108700","2":"Nestucca Valley School District 101J","3":"46","4":"36","5":"78.26","6":"<s_GEOMET>","7":"57","_rn_":"57"},{"1":"4103720","2":"Crook County School District","3":"235","4":"208","5":"88.51","6":"<s_GEOMET>","7":"58","_rn_":"58"},{"1":"4100019","2":"Harrisburg School District 7J","3":"64","4":"55","5":"85.94","6":"<s_GEOMET>","7":"59","_rn_":"59"},{"1":"4101620","2":"Astoria School District 1","3":"134","4":"111","5":"82.84","6":"<s_GEOMET>","7":"60","_rn_":"60"},{"1":"4103260","2":"Clatskanie School District 6J","3":"67","4":"45","5":"67.16","6":"<s_GEOMET>","7":"61","_rn_":"61"},{"1":"4106750","2":"Jewell School District 8","3":"7","4":"7","5":"100.00","6":"<s_GEOMET>","7":"62","_rn_":"62"},{"1":"4111100","2":"Seaside School District 10","3":"124","4":"96","5":"77.42","6":"<s_GEOMET>","7":"63","_rn_":"63"},{"1":"4113080","2":"Warrenton-Hammond School District 30","3":"65","4":"46","5":"70.77","6":"<s_GEOMET>","7":"64","_rn_":"64"},{"1":"4108720","2":"Newberg School District 29J","3":"385","4":"333","5":"86.49","6":"<s_GEOMET>","7":"65","_rn_":"65"},{"1":"4101830","2":"Banks School District 13","3":"106","4":"97","5":"91.51","6":"<s_GEOMET>","7":"66","_rn_":"66"},{"1":"4101920","2":"Beaverton School District 48J","3":"3219","4":"2845","5":"88.38","6":"<s_GEOMET>","7":"67","_rn_":"67"},{"1":"4105430","2":"Gaston School District 511J","3":"50","4":"47","5":"94.00","6":"<s_GEOMET>","7":"68","_rn_":"68"},{"1":"4101560","2":"Ashland School District 5","3":"217","4":"198","5":"91.24","6":"<s_GEOMET>","7":"69","_rn_":"69"},{"1":"4102580","2":"Butte Falls School District 91","3":"22","4":"14","5":"63.64","6":"<s_GEOMET>","7":"70","_rn_":"70"},{"1":"4108100","2":"Santiam Canyon School District 129J","3":"717","4":"403","5":"56.21","6":"<s_GEOMET>","7":"71","_rn_":"71"},{"1":"4110980","2":"Scappoose School District 1J","3":"167","4":"145","5":"86.83","6":"<s_GEOMET>","7":"72","_rn_":"72"},{"1":"4111290","2":"Sherwood School District 88J","3":"394","4":"382","5":"96.95","6":"<s_GEOMET>","7":"73","_rn_":"73"},{"1":"4113170","2":"West Linn School District 3J","3":"775","4":"736","5":"94.97","6":"<s_GEOMET>","7":"74","_rn_":"74"},{"1":"4106120","2":"Harper School District 66","3":"16","4":"15","5":"93.75","6":"<s_GEOMET>","7":"75","_rn_":"75"},{"1":"4100047","2":"Ione School District 2","3":"12","4":"12","5":"100.00","6":"<s_GEOMET>","7":"76","_rn_":"76"},{"1":"4103330","2":"Condon School District 25J","3":"12","4":"11","5":"91.67","6":"<s_GEOMET>","7":"77","_rn_":"77"},{"1":"4108280","2":"Mitchell School District 55","3":"157","4":"63","5":"40.13","6":"<s_GEOMET>","7":"78","_rn_":"78"},{"1":"4111640","2":"Spray School District 1","3":"2","4":"2","5":"100.00","6":"<s_GEOMET>","7":"79","_rn_":"79"},{"1":"4109600","2":"Philomath School District 17J","3":"147","4":"132","5":"89.80","6":"<s_GEOMET>","7":"80","_rn_":"80"},{"1":"4102160","2":"Blachly School District 090","3":"15","4":"12","5":"80.00","6":"<s_GEOMET>","7":"81","_rn_":"81"},{"1":"4104950","2":"Fern Ridge School District 28J","3":"113","4":"88","5":"77.88","6":"<s_GEOMET>","7":"82","_rn_":"82"},{"1":"4107590","2":"Lowell School District 71","3":"58","4":"50","5":"86.21","6":"<s_GEOMET>","7":"83","_rn_":"83"},{"1":"4111580","2":"South Lane School District 45J","3":"223","4":"154","5":"69.06","6":"<s_GEOMET>","7":"84","_rn_":"84"},{"1":"4108550","2":"Mount Angel School District 91","3":"47","4":"36","5":"76.60","6":"<s_GEOMET>","7":"85","_rn_":"85"},{"1":"4107200","2":"La Grande School District 1","3":"157","4":"135","5":"85.99","6":"<s_GEOMET>","7":"86","_rn_":"86"},{"1":"4106600","2":"Huntington School District 16J","3":"5","4":"3","5":"60.00","6":"<s_GEOMET>","7":"87","_rn_":"87"},{"1":"4102800","2":"Centennial School District 28J","3":"465","4":"342","5":"73.55","6":"<s_GEOMET>","7":"88","_rn_":"88"},{"1":"4110520","2":"Reynolds School District 7","3":"788","4":"450","5":"57.11","6":"<s_GEOMET>","7":"89","_rn_":"89"},{"1":"4102910","2":"Central Linn School District 552","3":"46","4":"38","5":"82.61","6":"<s_GEOMET>","7":"90","_rn_":"90"},{"1":"4108430","2":"Monroe School District 1J","3":"32","4":"27","5":"84.38","6":"<s_GEOMET>","7":"91","_rn_":"91"},{"1":"4108940","2":"North Powder School District 8J","3":"20","4":"16","5":"80.00","6":"<s_GEOMET>","7":"92","_rn_":"92"},{"1":"4109720","2":"Pine-Eagle School District 61","3":"18","4":"17","5":"94.44","6":"<s_GEOMET>","7":"93","_rn_":"93"},{"1":"4103990","2":"Dayton School District 8","3":"100","4":"79","5":"79.00","6":"<s_GEOMET>","7":"94","_rn_":"94"},{"1":"4106780","2":"John Day School District 3","3":"32","4":"29","5":"90.63","6":"<s_GEOMET>","7":"95","_rn_":"95"},{"1":"4103265","2":"Rainier School District 13","3":"72","4":"43","5":"59.72","6":"<s_GEOMET>","7":"96","_rn_":"96"},{"1":"4108650","2":"Neah-Kah-Nie School District 56","3":"62","4":"53","5":"85.48","6":"<s_GEOMET>","7":"97","_rn_":"97"},{"1":"4113350","2":"Willamina School District 30J","3":"57","4":"47","5":"82.46","6":"<s_GEOMET>","7":"98","_rn_":"98"},{"1":"4102940","2":"Central Point School District 6","3":"313","4":"245","5":"78.27","6":"<s_GEOMET>","7":"99","_rn_":"99"},{"1":"4108040","2":"Medford School District 549","3":"972","4":"801","5":"82.41","6":"<s_GEOMET>","7":"100","_rn_":"100"},{"1":"4109630","2":"Phoenix-Talent School District 4","3":"184","4":"170","5":"92.39","6":"<s_GEOMET>","7":"101","_rn_":"101"},{"1":"4110200","2":"Prospect School District 59","3":"22","4":"14","5":"63.64","6":"<s_GEOMET>","7":"102","_rn_":"102"},{"1":"4110680","2":"Rogue River School District 35","3":"105","4":"71","5":"67.62","6":"<s_GEOMET>","7":"103","_rn_":"103"},{"1":"4111720","2":"St. Helens School District 502","3":"216","4":"154","5":"71.30","6":"<s_GEOMET>","7":"104","_rn_":"104"},{"1":"4100020","2":"North Santiam School District 29J","3":"179","4":"152","5":"84.92","6":"<s_GEOMET>","7":"105","_rn_":"105"},{"1":"4102780","2":"Cascade School District 5","3":"188","4":"158","5":"84.04","6":"<s_GEOMET>","7":"106","_rn_":"106"},{"1":"4107380","2":"Lebanon Community School District 9","3":"286","4":"221","5":"77.27","6":"<s_GEOMET>","7":"107","_rn_":"107"},{"1":"4111040","2":"Scio School District 95","3":"105","4":"84","5":"80.00","6":"<s_GEOMET>","7":"108","_rn_":"108"},{"1":"4109960","2":"Plush School District 18","3":"0","4":"0","5":"NA","6":"<s_GEOMET>","7":"109","_rn_":"109"},{"1":"4111400","2":"North Lake School District 14","3":"23","4":"19","5":"82.61","6":"<s_GEOMET>","7":"110","_rn_":"110"},{"1":"4105160","2":"Forest Grove School District 15","3":"475","4":"375","5":"78.95","6":"<s_GEOMET>","7":"111","_rn_":"111"},{"1":"4107080","2":"Klamath Falls City Schools","3":"273","4":"201","5":"73.63","6":"<s_GEOMET>","7":"112","_rn_":"112"},{"1":"4112240","2":"Tigard-Tualatin School District 23J","3":"985","4":"869","5":"88.22","6":"<s_GEOMET>","7":"113","_rn_":"113"},{"1":"4108520","2":"Morrow School District 1","3":"163","4":"157","5":"96.32","6":"<s_GEOMET>","7":"114","_rn_":"114"},{"1":"4105910","2":"Grants Pass School District 7","3":"487","4":"376","5":"77.21","6":"<s_GEOMET>","7":"115","_rn_":"115"},{"1":"4103270","2":"Colton School District 53","3":"56","4":"55","5":"98.21","6":"<s_GEOMET>","7":"116","_rn_":"116"},{"1":"4108830","2":"North Clackamas School District 12","3":"1461","4":"1289","5":"88.23","6":"<s_GEOMET>","7":"117","_rn_":"117"},{"1":"4105250","2":"Fossil School District 21J","3":"1","4":"0","5":"0.00","6":"<s_GEOMET>","7":"118","_rn_":"118"},{"1":"4100640","2":"Myrtle Point School District 41","3":"33","4":"31","5":"93.94","6":"<s_GEOMET>","7":"119","_rn_":"119"},{"1":"4103660","2":"Coos Bay School District 9","3":"229","4":"152","5":"66.38","6":"<s_GEOMET>","7":"120","_rn_":"120"},{"1":"4104350","2":"North Douglas School District 22","3":"11","4":"8","5":"72.73","6":"<s_GEOMET>","7":"121","_rn_":"121"},{"1":"4110710","2":"Roseburg School District 4","3":"488","4":"338","5":"69.26","6":"<s_GEOMET>","7":"122","_rn_":"122"},{"1":"4113490","2":"Winston-Dillard School District 116","3":"120","4":"79","5":"65.83","6":"<s_GEOMET>","7":"123","_rn_":"123"},{"1":"4106000","2":"Gresham-Barlow School District 1J","3":"1067","4":"791","5":"74.13","6":"<s_GEOMET>","7":"124","_rn_":"124"},{"1":"4109660","2":"Pilot Rock School District 2","3":"29","4":"24","5":"82.76","6":"<s_GEOMET>","7":"125","_rn_":"125"},{"1":"4106930","2":"Junction City School District 69","3":"133","4":"110","5":"82.71","6":"<s_GEOMET>","7":"126","_rn_":"126"},{"1":"4101800","2":"Bandon School District 54","3":"44","4":"36","5":"81.82","6":"<s_GEOMET>","7":"127","_rn_":"127"},{"1":"4103390","2":"Coquille School District 8","3":"172","4":"89","5":"51.74","6":"<s_GEOMET>","7":"128","_rn_":"128"},{"1":"4102610","2":"Camas Valley School District 21J","3":"14","4":"11","5":"78.57","6":"<s_GEOMET>","7":"129","_rn_":"129"},{"1":"4110020","2":"Port Orford-Langlois School District 2J","3":"11","4":"10","5":"90.91","6":"<s_GEOMET>","7":"130","_rn_":"130"},{"1":"4104620","2":"Elkton School District 34","3":"23","4":"22","5":"95.65","6":"<s_GEOMET>","7":"131","_rn_":"131"},{"1":"4105640","2":"Glendale School District 77","3":"23","4":"19","5":"82.61","6":"<s_GEOMET>","7":"132","_rn_":"132"},{"1":"4109120","2":"Oakland School District 1","3":"56","4":"55","5":"98.21","6":"<s_GEOMET>","7":"133","_rn_":"133"},{"1":"4111610","2":"South Umpqua School District 19","3":"90","4":"62","5":"68.89","6":"<s_GEOMET>","7":"134","_rn_":"134"},{"1":"4113650","2":"Yoncalla School District 32","3":"50","4":"39","5":"78.00","6":"<s_GEOMET>","7":"135","_rn_":"135"},{"1":"4100040","2":"Knappa School District 4","3":"30","4":"25","5":"83.33","6":"<s_GEOMET>","7":"136","_rn_":"136"},{"1":"4103540","2":"Cove School District 15","3":"21","4":"18","5":"85.71","6":"<s_GEOMET>","7":"137","_rn_":"137"},{"1":"4106630","2":"Imbler School District 11","3":"20","4":"20","5":"100.00","6":"<s_GEOMET>","7":"138","_rn_":"138"},{"1":"4112690","2":"Union School District 5","3":"34","4":"32","5":"94.12","6":"<s_GEOMET>","7":"139","_rn_":"139"},{"1":"4100048","2":"North Wasco School District 21","3":"235","4":"157","5":"66.81","6":"<s_GEOMET>","7":"140","_rn_":"140"},{"1":"4107530","2":"Long Creek School District 17","3":"6","4":"5","5":"83.33","6":"<s_GEOMET>","7":"141","_rn_":"141"},{"1":"4105610","2":"Gladstone School District 115","3":"143","4":"123","5":"86.01","6":"<s_GEOMET>","7":"142","_rn_":"142"},{"1":"4101500","2":"Arock School District 81","3":"0","4":"0","5":"NA","6":"<s_GEOMET>","7":"143","_rn_":"143"},{"1":"4109270","2":"Ontario School District 8","3":"180","4":"157","5":"87.22","6":"<s_GEOMET>","7":"144","_rn_":"144"},{"1":"4103940","2":"David Douglas School District 40","3":"745","4":"538","5":"72.21","6":"<s_GEOMET>","7":"145","_rn_":"145"},{"1":"4107230","2":"Lake Oswego School District 7J","3":"608","4":"592","5":"97.37","6":"<s_GEOMET>","7":"146","_rn_":"146"},{"1":"4100014","2":"Vale School District 84","3":"69","4":"67","5":"97.10","6":"<s_GEOMET>","7":"147","_rn_":"147"},{"1":"4101350","2":"Annex School District 29","3":"7","4":"0","5":"0.00","6":"<s_GEOMET>","7":"148","_rn_":"148"},{"1":"4103690","2":"Creswell School District 40","3":"81","4":"67","5":"82.72","6":"<s_GEOMET>","7":"149","_rn_":"149"},{"1":"4103780","2":"Crow-Applegate-Lorane Sd 66","3":"22","4":"17","5":"77.27","6":"<s_GEOMET>","7":"150","_rn_":"150"},{"1":"4107710","2":"Mapleton School District 32","3":"17","4":"9","5":"52.94","6":"<s_GEOMET>","7":"151","_rn_":"151"},{"1":"4109870","2":"Pleasant Hill School District 1","3":"84","4":"74","5":"88.10","6":"<s_GEOMET>","7":"152","_rn_":"152"},{"1":"4100015","2":"Gervais School District 1","3":"128","4":"103","5":"80.47","6":"<s_GEOMET>","7":"153","_rn_":"153"},{"1":"4108880","2":"North Marion School District 15","3":"152","4":"122","5":"80.26","6":"<s_GEOMET>","7":"154","_rn_":"154"},{"1":"4111220","2":"Sheridan School District 48J","3":"96","4":"77","5":"80.21","6":"<s_GEOMET>","7":"155","_rn_":"155"},{"1":"4104530","2":"Echo School District 5","3":"18","4":"17","5":"94.44","6":"<s_GEOMET>","7":"156","_rn_":"156"},{"1":"4106270","2":"Helix School District 1","3":"7","4":"7","5":"100.00","6":"<s_GEOMET>","7":"157","_rn_":"157"},{"1":"4106300","2":"Hermiston School District 8","3":"399","4":"351","5":"87.97","6":"<s_GEOMET>","7":"158","_rn_":"158"},{"1":"4109510","2":"Pendleton School District 16","3":"241","4":"182","5":"75.52","6":"<s_GEOMET>","7":"159","_rn_":"159"},{"1":"4112600","2":"Umatilla School District 6","3":"111","4":"90","5":"81.08","6":"<s_GEOMET>","7":"160","_rn_":"160"},{"1":"4106510","2":"Hood River County School District 1","3":"336","4":"304","5":"90.48","6":"<s_GEOMET>","7":"161","_rn_":"161"},{"1":"4101590","2":"Ashwood School District 8","3":"1","4":"1","5":"100.00","6":"<s_GEOMET>","7":"162","_rn_":"162"},{"1":"4113530","2":"Woodburn School District 103","3":"407","4":"306","5":"75.18","6":"<s_GEOMET>","7":"163","_rn_":"163"},{"1":"4100003","2":"Falls City School District 57","3":"25","4":"19","5":"76.00","6":"<s_GEOMET>","7":"164","_rn_":"164"},{"1":"4101230","2":"Amity School District 4J","3":"74","4":"61","5":"82.43","6":"<s_GEOMET>","7":"165","_rn_":"165"},{"1":"4109530","2":"Perrydale School District 21","3":"22","4":"22","5":"100.00","6":"<s_GEOMET>","7":"166","_rn_":"166"},{"1":"4102040","2":"Bethel School District 52","3":"414","4":"348","5":"84.06","6":"<s_GEOMET>","7":"167","_rn_":"167"},{"1":"4105100","2":"Siuslaw School District 97J","3":"100","4":"66","5":"66.00","6":"<s_GEOMET>","7":"168","_rn_":"168"},{"1":"4107740","2":"Marcola School District 79J","3":"51","4":"36","5":"70.59","6":"<s_GEOMET>","7":"169","_rn_":"169"},{"1":"4111670","2":"Springfield School District 19","3":"777","4":"582","5":"74.90","6":"<s_GEOMET>","7":"170","_rn_":"170"},{"1":"4108820","2":"North Bend School District 13","3":"452","4":"276","5":"61.06","6":"<s_GEOMET>","7":"171","_rn_":"171"},{"1":"4103960","2":"Days Creek School District 15","3":"22","4":"18","5":"81.82","6":"<s_GEOMET>","7":"172","_rn_":"172"},{"1":"4110410","2":"Reedsport School District 105","3":"47","4":"35","5":"74.47","6":"<s_GEOMET>","7":"173","_rn_":"173"},{"1":"4111940","2":"Sutherlin School District 130","3":"105","4":"77","5":"73.33","6":"<s_GEOMET>","7":"174","_rn_":"174"},{"1":"4104590","2":"Elgin School District 23","3":"42","4":"30","5":"71.43","6":"<s_GEOMET>","7":"175","_rn_":"175"},{"1":"4100016","2":"Yamhill-Carlton School District 1","3":"77","4":"62","5":"80.52","6":"<s_GEOMET>","7":"176","_rn_":"176"},{"1":"4112320","2":"Tillamook School District 9","3":"185","4":"152","5":"82.16","6":"<s_GEOMET>","7":"177","_rn_":"177"},{"1":"4111760","2":"St. Paul School District 45","3":"24","4":"23","5":"95.83","6":"<s_GEOMET>","7":"178","_rn_":"178"},{"1":"4101660","2":"Athena-Weston School District 29J","3":"48","4":"40","5":"83.33","6":"<s_GEOMET>","7":"179","_rn_":"179"},{"1":"4108160","2":"Milton-Freewater School District 7","3":"118","4":"88","5":"74.58","6":"<s_GEOMET>","7":"180","_rn_":"180"},{"1":"4111490","2":"Sisters School District 6","3":"113","4":"106","5":"93.81","6":"<s_GEOMET>","7":"181","_rn_":"181"},{"1":"4101020","2":"Adrian School District 61","3":"17","4":"17","5":"100.00","6":"<s_GEOMET>","7":"182","_rn_":"182"},{"1":"4107280","2":"Lakeview School District 7","3":"54","4":"48","5":"88.89","6":"<s_GEOMET>","7":"183","_rn_":"183"},{"1":"4106710","2":"Jefferson School District 14J","3":"66","4":"58","5":"87.88","6":"<s_GEOMET>","7":"184","_rn_":"184"},{"1":"4103420","2":"Corbett School District 39","3":"79","4":"72","5":"91.14","6":"<s_GEOMET>","7":"185","_rn_":"185"},{"1":"4102190","2":"Black Butte School District 41","3":"2","4":"1","5":"50.00","6":"<s_GEOMET>","7":"186","_rn_":"186"},{"1":"4104380","2":"Drewsey School District 13","3":"0","4":"0","5":"NA","6":"<s_GEOMET>","7":"187","_rn_":"187"},{"1":"4104290","2":"Double O School District 28","3":"0","4":"0","5":"NA","6":"<s_GEOMET>","7":"188","_rn_":"188"},{"1":"4104170","2":"Diamond School District 7","3":"0","4":"0","5":"NA","6":"<s_GEOMET>","7":"189","_rn_":"189"},{"1":"4111910","2":"Suntex School District 10","3":"0","4":"0","5":"NA","6":"<s_GEOMET>","7":"190","_rn_":"190"},{"1":"4105310","2":"Frenchglen School District 16","3":"0","4":"0","5":"NA","6":"<s_GEOMET>","7":"191","_rn_":"191"},{"1":"4109690","2":"Pine Creek School District 5","3":"0","4":"0","5":"NA","6":"<s_GEOMET>","7":"192","_rn_":"192"},{"1":"4103600","2":"Harney County School District 4","3":"18","4":"10","5":"55.56","6":"<s_GEOMET>","7":"193","_rn_":"193"},{"1":"4105020","2":"South Harney School District 33","3":"0","4":"0","5":"NA","6":"<s_GEOMET>","7":"194","_rn_":"194"},{"1":"4106960","2":"Juntura School District 12","3":"0","4":"0","5":"NA","6":"<s_GEOMET>","7":"195","_rn_":"195"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="spatial-analysis-using-inla" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Spatial analysis using INLA</h1>
+<p>This analysis is essentially the same as the one in Chapter 5 of Paula Moraga’s book <a href="https://www.paulamoraga.com/book-geospatial/sec-arealdatatheory.html">Geospatial Health Data</a>.</p>
+<p>The first step in the analysis is to take the school district areas and catalog which districts are adjacent to which others. This can be done programmatically using the district geometries we fetched using tidycensus.</p>
+<p>The function <code>spdep::poly2nb()</code> takes a set of geographic polygons (our school districts) and returns a list of lists enumerating which polygons are adjacent. We can then use <code>INLA::inla.read.graph()</code> to convert that result into a format <code>INLA::inla()</code> will understand.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>nbhds <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(or_grad)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nb2INLA</span>(<span class="st">&quot;districts.adj&quot;</span>, nbhds)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>graph <span class="ot">&lt;-</span> <span class="fu">inla.read.graph</span>(<span class="at">filename =</span> <span class="st">&quot;districts.adj&quot;</span>)</span></code></pre></div>
+<p>Let’s plot a visual representation of the adjacency network we just constructed by drawing lines between centroids of adjacent school districts.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>.or_centroids <span class="ot">&lt;-</span> <span class="fu">st_centroid</span>(or_grad)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># get coordinates of centroids</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>.coordinates <span class="ot">&lt;-</span> </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  .or_centroids <span class="sc">%&gt;%</span> </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(geometry)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>.line_segments <span class="ot">&lt;-</span> <span class="fu">lapply</span>(  <span class="co"># there is probably a clearer way to do this</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(nbhds),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(i) {</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> nbhds[[i]]</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> x[x <span class="sc">&gt;</span> i]  <span class="co"># prevents duplicate lines</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(x, <span class="cf">function</span>(j) <span class="fu">st_linestring</span>(<span class="fu">c</span>(.coordinates[[i]], .coordinates[[j]])))</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>.edges <span class="ot">&lt;-</span> <span class="fu">st_sf</span>(</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">geometry =</span> <span class="fu">st_sfc</span>(<span class="fu">do.call</span>(c, .line_segments))),</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">crs =</span> <span class="fu">st_crs</span>(.or_centroids)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> .edges, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> .or_centroids, <span class="at">color =</span> <span class="st">&quot;blue&quot;</span>) <span class="sc">+</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Adjacency graph for school districts&quot;</span>)</span></code></pre></div>
+<p><img src="spatial_grad_rates_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>In this graph, each blue dot represents a district, and two dots are connected if the districts are adjacent.</p>
+<p>The main idea of the analysis is that we want to estimate each district’s latent graduation rate incorporating any detected correlation with neighboring districts in this network.</p>
+<p>We’ll fit a BYM2 model to the data using INLA. The BYM2 model is a reparameterization of the usual BYM model that has a nicer posterior geometry and easily-interpretable coefficients. See the next section for more on the theory behind this model.</p>
+<p>We’ll tweak the priors used by Moraga a bit:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>prior <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">prec =</span> <span class="fu">list</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">prior =</span> <span class="st">&quot;pc.prec&quot;</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">param =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">/</span><span class="fl">0.31</span>, <span class="fl">0.01</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">phi =</span> <span class="fu">list</span>(</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">prior =</span> <span class="st">&quot;pc&quot;</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">param =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">2</span><span class="sc">/</span><span class="dv">3</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>fit_inla <span class="ot">&lt;-</span> <span class="fu">inla</span>(</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  grads <span class="sc">~</span> <span class="fu">f</span>(idarea, <span class="at">model =</span> <span class="st">&quot;bym2&quot;</span>, <span class="at">graph =</span> graph, <span class="at">hyper =</span> prior),</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">Ntrials =</span> or_grad<span class="sc">$</span>cohort,</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>,</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> or_grad,</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">control.predictor =</span> <span class="fu">list</span>(<span class="at">compute =</span> <span class="cn">TRUE</span>, <span class="at">link =</span> <span class="dv">1</span>),</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">control.compute =</span> <span class="fu">list</span>(<span class="at">config =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_inla)</span></code></pre></div>
+<pre><code>## 
+## Call:
+##    c(&quot;inla.core(formula = formula, family = family, contrasts = contrasts, 
+##    &quot;, &quot; data = data, quantiles = quantiles, E = E, offset = offset, &quot;, &quot; 
+##    scale = scale, weights = weights, Ntrials = Ntrials, strata = strata, 
+##    &quot;, &quot; lp.scale = lp.scale, link.covariates = link.covariates, verbose = 
+##    verbose, &quot;, &quot; lincomb = lincomb, selection = selection, control.compute 
+##    = control.compute, &quot;, &quot; control.predictor = control.predictor, 
+##    control.family = control.family, &quot;, &quot; control.inla = control.inla, 
+##    control.fixed = control.fixed, &quot;, &quot; control.mode = control.mode, 
+##    control.expert = control.expert, &quot;, &quot; control.hazard = control.hazard, 
+##    control.lincomb = control.lincomb, &quot;, &quot; control.update = 
+##    control.update, control.lp.scale = control.lp.scale, &quot;, &quot; 
+##    control.pardiso = control.pardiso, only.hyperparam = only.hyperparam, 
+##    &quot;, &quot; inla.call = inla.call, inla.arg = inla.arg, num.threads = 
+##    num.threads, &quot;, &quot; blas.num.threads = blas.num.threads, keep = keep, 
+##    working.directory = working.directory, &quot;, &quot; silent = silent, inla.mode 
+##    = inla.mode, safe = FALSE, debug = debug, &quot;, &quot; .parent.frame = 
+##    .parent.frame)&quot;) 
+## Time used:
+##     Pre = 11.1, Running = 1.08, Post = 0.335, Total = 12.5 
+## Fixed effects:
+##              mean    sd 0.025quant 0.5quant 0.975quant  mode kld
+## (Intercept) 1.606 0.054      1.501    1.606      1.713 1.605   0
+## 
+## Random effects:
+##   Name     Model
+##     idarea BYM2 model
+## 
+## Model hyperparameters:
+##                       mean    sd 0.025quant 0.5quant 0.975quant  mode
+## Precision for idarea 2.041 0.349      1.440    2.012      2.809 1.955
+## Phi for idarea       0.415 0.181      0.106    0.404      0.777 0.366
+## 
+## Marginal log-Likelihood:  -540.91 
+##  is computed 
+## Posterior summaries for the linear predictor and the fitted values are computed
+## (Posterior marginals needs also &#39;control.compute=list(return.marginals.predictor=TRUE)&#39;)</code></pre>
+<p>In the BYM2 model, the hyperparameter phi measures the proportion of the variance that can be attributed to spatial correlation. The model estimates that spatial correlation accounts for between 11% and 78% of the variance in the graduation rates.</p>
+<p>First, here’s a map of the raw 2018-2019 graduation rates from ODE’s data:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>or_grad <span class="sc">%&gt;%</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">grad_rate =</span> grad_rate<span class="sc">/</span><span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> grad_rate)) <span class="sc">+</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(<span class="at">labels =</span> percent) <span class="sc">+</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Raw graduation rates&quot;</span>)</span></code></pre></div>
+<p><img src="spatial_grad_rates_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Note that some of the districts are missing (gray). These districts ended up having no students in their 2019-2020 “four-year cohorts”. A four-year cohort is a group of students who entered together as freshmen - ODE uses these to calculate graduation rates. A cohort may end up being empty at the end of the four years because students transfer out to other districts or pass away.</p>
+<p>Again, the goal of the analysis is to estimate the latent graduation rates of all of the districts, including these districts that essentially had no students. This is something we can get from the model.</p>
+<p>Indeed, here is a plot of the posterior mean estimates of the latent graduation rates obtained from the model:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>or_grad_inla_posterior <span class="ot">&lt;-</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  fit_inla<span class="sc">$</span>summary.fitted.values <span class="sc">%&gt;%</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(mean, <span class="at">lower =</span> <span class="st">`</span><span class="at">0.025quant</span><span class="st">`</span>, <span class="at">upper =</span> <span class="st">`</span><span class="at">0.975quant</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(or_grad, .)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>or_grad_inla_posterior <span class="sc">%&gt;%</span> </span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> mean)) <span class="sc">+</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> percent) <span class="sc">+</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Posterior mean graduation rates&quot;</span>)</span></code></pre></div>
+<p><img src="spatial_grad_rates_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>Clearly a lot of shrinkage (smoothing) occurred, which is a good thing. Districts with few students don’t have a lot of data available and their raw graduation rates will generally be super noisy and sensitive to their specific students that year. This model is an attempt to account for that.</p>
+<p>What’s more useful than just getting posterior means is that we get measures of the uncertainty around these inferred graduation rates. Here’s a plot showing the lower and upper ends of each district’s 95% posterior density interval:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>.plot_skeleton <span class="ot">&lt;-</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  or_grad_inla_posterior <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">min</span>(or_grad_inla_posterior<span class="sc">$</span>lower),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">max</span>(or_grad_inla_posterior<span class="sc">$</span>upper)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> (<span class="dv">0</span><span class="sc">:</span><span class="dv">10</span>)<span class="sc">/</span><span class="dv">10</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> percent</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.key.width =</span> <span class="fu">unit</span>(<span class="fl">0.15</span>, <span class="st">&quot;npc&quot;</span>))</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>gg_l <span class="ot">&lt;-</span> </span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  .plot_skeleton <span class="sc">+</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> lower), <span class="at">size =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Lower estimate&quot;</span>)</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>gg_u <span class="ot">&lt;-</span> </span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  .plot_skeleton <span class="sc">+</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> upper), <span class="at">size =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Upper estimate&quot;</span>)</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="fu">ggarrange</span>(</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  gg_l, gg_u,</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend =</span> <span class="st">&quot;bottom&quot;</span>,</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">common.legend =</span> <span class="cn">TRUE</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate_figure</span>(<span class="st">&quot;Plausible latent graduation rates in Oregon school districts&quot;</span>)</span></code></pre></div>
+<p><img src="spatial_grad_rates_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>There are lots of other interesting things we can get from this model, especially if we sample from the posterior.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>inla_draws <span class="ot">&lt;-</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inla.posterior.sample</span>(<span class="fl">1e3</span>, fit_inla) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">map_dfr</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as_tibble</span>(<span class="fu">t</span>(.x<span class="sc">$</span>hyperpar)),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as_tibble</span>(<span class="fu">t</span>(.x<span class="sc">$</span>latent[,<span class="dv">1</span>]))</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">starts_with</span>(<span class="st">&quot;idarea&quot;</span>))</span></code></pre></div>
+<p>Posterior samples are much more flexible than just posterior means and uncertainty intervals. For example, we can now sample entire maps.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>n_maps <span class="ot">&lt;-</span> <span class="dv">6</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>.grad_rate_draws <span class="ot">&lt;-</span> </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  inla_draws <span class="sc">%&gt;%</span> </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;predictor&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), plogis))</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>.plot_skeleton <span class="ot">&lt;-</span> </span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(<span class="fu">min</span>(.grad_rate_draws), <span class="fu">max</span>(.grad_rate_draws)),</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> (<span class="dv">0</span><span class="sc">:</span><span class="dv">10</span>)<span class="sc">/</span><span class="dv">10</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> percent</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.key.width =</span> <span class="fu">unit</span>(<span class="fl">0.15</span>, <span class="st">&quot;npc&quot;</span>))</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>.maps <span class="ot">&lt;-</span> <span class="fu">replicate</span>(</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  n_maps,</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  {</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    or_grad_sample <span class="ot">&lt;-</span> </span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>      or_grad <span class="sc">%&gt;%</span> </span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">estimate =</span> </span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>          .grad_rate_draws <span class="sc">%&gt;%</span> </span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>          <span class="fu">sample_n</span>(<span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>          <span class="fu">as.numeric</span>()</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>    .plot_skeleton <span class="sc">+</span> </span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_sf</span>(<span class="at">data =</span> or_grad_sample, <span class="fu">aes</span>(<span class="at">fill =</span> estimate), <span class="at">size =</span> <span class="fl">0.1</span>)</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">simplify =</span> <span class="cn">FALSE</span></span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a><span class="fu">do.call</span>(ggarrange, <span class="fu">c</span>(.maps, <span class="at">legend =</span> <span class="st">&quot;bottom&quot;</span>, <span class="at">common.legend =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate_figure</span>(<span class="st">&quot;Plausible latent graduation rates in Oregon school districts&quot;</span>)</span></code></pre></div>
+<p><img src="spatial_grad_rates_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>This plot shows six maps, each drawn from the posterior of our model. In a sense, the model perceives each of these maps as a plausible map of the latent graduation rates.</p>
+<p>Picking out spatial trends is a bit tricky using a continuous color scale, so let’s use a discrete color scale instead. We’ll sort the graduation rates into six bins, with three bins below 80% and three above 80%.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>.posterior_grad_rate_quantiles <span class="ot">&lt;-</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  .grad_rate_draws <span class="sc">%&gt;%</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unlist</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">quantile</span>((<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)<span class="sc">/</span><span class="dv">6</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate nice breaks by mapping quantiles</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># to nearby points centered at 0.8</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>.x <span class="ot">&lt;-</span> .posterior_grad_rate_quantiles[<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>)]  <span class="co"># starting points</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>.b <span class="ot">&lt;-</span> .x</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>.b[<span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="fl">0.8</span> <span class="co"># target</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>.a <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, .x, .x<span class="sc">^</span><span class="dv">2</span>), <span class="at">nrow =</span> <span class="dv">3</span>), .b)  <span class="co"># map coefficients</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>.adjust_breaks <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">sum</span>(.a <span class="sc">*</span> <span class="fu">c</span>(<span class="dv">1</span>, x, x<span class="sc">^</span><span class="dv">2</span>))  <span class="co"># quadratic map</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>.breaks <span class="ot">&lt;-</span> <span class="fu">sapply</span>(.posterior_grad_rate_quantiles, .adjust_breaks)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>.plot_skeleton <span class="ot">&lt;-</span> </span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.key.width =</span> <span class="fu">unit</span>(<span class="fl">0.15</span>, <span class="st">&quot;npc&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_fermenter</span>(</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">&quot;div&quot;</span>,</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette =</span> <span class="st">&quot;RdBu&quot;</span>,</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">direction =</span> <span class="dv">1</span>,</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> .breaks <span class="sc">-</span> <span class="fl">0.8</span>,</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;&lt; 80%&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;80% grad rate&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;&gt; 80%&quot;</span>)</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>.maps <span class="ot">&lt;-</span> <span class="fu">replicate</span>(</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>  n_maps,</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>  {</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>    or_grad_sample <span class="ot">&lt;-</span> </span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>      or_grad <span class="sc">%&gt;%</span> </span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">estimate =</span> </span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>          .grad_rate_draws <span class="sc">%&gt;%</span> </span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>          <span class="fu">sample_n</span>(<span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>          <span class="fu">as.numeric</span>(),</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>        <span class="at">estimate =</span> estimate <span class="sc">-</span> <span class="fl">0.8</span></span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>    .plot_skeleton <span class="sc">+</span></span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_sf</span>(<span class="at">data =</span> or_grad_sample, <span class="fu">aes</span>(<span class="at">fill =</span> estimate), <span class="at">size =</span> <span class="fl">0.1</span>)</span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">simplify =</span> <span class="cn">FALSE</span></span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a><span class="fu">do.call</span>(ggarrange, <span class="fu">c</span>(.maps, <span class="at">legend =</span> <span class="st">&quot;bottom&quot;</span>, <span class="at">common.legend =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate_figure</span>(<span class="st">&quot;Plausible latent graduation rates in Oregon school districts&quot;</span>)</span></code></pre></div>
+<p><img src="spatial_grad_rates_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>Now it’s much easier to pick out red areas and blue areas.</p>
+<p>Visually inspecting multiple maps sampled from the posterior allows us to test our mental model of the data. Features that stand out in multiple sampled maps may reflect real patterns in the data.</p>
+</div>
+<div id="theory-behind-the-bym-and-bym2-models" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Theory behind the BYM and BYM2 models</h1>
+<p>For anyone looking to learn more about the BYM model and other autoregressive spatial models, <a href="https://mc-stan.org/users/documentation/case-studies/icar_stan.html">Mitzi Morris has an incredible writeup</a> which was later expanded into an <a href="https://www.sciencedirect.com/science/article/abs/pii/S1877584518301175">article in the journal Spatial and Spatio-temporal Epidemiology</a>. I strongly suggest reading those since I’ll just give the briefest overview here.</p>
+<p>The BYM model has a linear predictor of the form</p>
+<p><span class="math display">\[
+\psi = x\beta + \theta + \xi,
+\]</span></p>
+<p>where <span class="math inline">\(x\beta\)</span> are the fixed effects, <span class="math inline">\(\theta\)</span> is an ordinary random-effects component with</p>
+<p><span class="math display">\[
+\theta \sim \operatorname{Normal}(0, \sigma_\theta),
+\]</span></p>
+<p>and <span class="math inline">\(\xi\)</span> is a special random-effects component called an ‘ICAR component’ that measures spatial variation. The distribution of this ICAR component can be written as</p>
+<p><span class="math display">\[
+p(\xi) \propto \exp\!\left[-\frac{1}{2} \sum_{i \sim j} (\xi_i - \xi_j)^2\right], \\
+\sum_i \xi_i = 0,
+\]</span></p>
+<p>where <span class="math inline">\(i \sim j\)</span> means that node <span class="math inline">\(i\)</span> and node <span class="math inline">\(j\)</span> are spatially adjacent (touching).</p>
+<p>The posterior geometry for the BYM model is not particularly nice (making it hard to analyze) and the complicated nature of <span class="math inline">\(\xi\)</span> makes it difficult to specify an intuitive prior for <span class="math inline">\(\sigma_\theta\)</span>, the scale of <span class="math inline">\(\theta\)</span>. An alternative parameterization of the BYM model, called the BYM2 model, was introduced by <a href="https://pubmed.ncbi.nlm.nih.gov/27566770/">Riebler et al. in 2016</a> to solve these issues.</p>
+<p>The linear predictor of the BYM2 model has the form</p>
+<p><span class="math display">\[
+\psi = x\beta + \nu,
+\]</span></p>
+<p>where <span class="math inline">\(x\beta\)</span> is again the term for the fixed effects but <span class="math inline">\(\nu\)</span> is a particular convolution of the iid random-effects component and the ICAR component:</p>
+<p><span class="math display">\[
+\nu = \sigma \left( \sqrt{1 - \phi}\,\theta + \sqrt{\phi}\,\xi^* \right), \\
+ \\
+\theta \sim \operatorname{Normal}(0, 1), \qquad \xi^* = c \xi.
+\]</span></p>
+<p>This is essentially a weighted sum of the two random-effects components. Here, <span class="math inline">\(\xi\)</span> has the same ICAR distribution as above, but <span class="math inline">\(c\)</span> is a new scale factor that makes <span class="math inline">\(\operatorname{Var}(\xi^*) = 1\)</span>. This parameterization leads to relatively intuitive interpretations of the remaining parameters <span class="math inline">\(\phi\)</span> and <span class="math inline">\(\sigma\)</span>:</p>
+<ul>
+<li><span class="math inline">\(\phi\)</span> is the proportion of the variance of the random effects that is attributable to <span class="math inline">\(\xi^*\)</span>, the ICAR component, and</li>
+<li><span class="math inline">\(\sigma\)</span> is the overall scale of the random effects.</li>
+</ul>
+<p>The scale factor <span class="math inline">\(c\)</span> is computed directly from the adjacency graph of the data.</p>
+<p>One especially nice thing about this parameterization is that it decouples the variance for <span class="math inline">\(\theta\)</span> from the variance for <span class="math inline">\(\xi\)</span>, leading to a much simpler posterior geometry. It’s also much easier to come up with sensible priors for <span class="math inline">\(\phi\)</span> and <span class="math inline">\(\sigma\)</span>.</p>
+</div>
+<div id="reimplementing-the-bym2-model-in-stan" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Reimplementing the BYM2 model in Stan</h1>
+<p>Here’s our Stan code for the BYM2 model. This is largely identical to <a href="https://mc-stan.org/users/documentation/case-studies/icar_stan.html#bym2-improving-the-parameterization-of-the-besag-york-and-mollie-model">Mitzi Morris’ code</a>.</p>
+<pre class="stan"><code>functions {
+  real icar_normal_lpdf(vector phi, int N, int[] node1, int[] node2) {
+    return -0.5 * dot_self(phi[node1] - phi[node2])
+      + normal_lpdf(sum(phi) | 0, 0.001 * N);  // soft sum-to-zero constraint
+  }
+}
+data {
+  int&lt;lower=1&gt; N_areas;                        // number of districts
+  
+  int&lt;lower=1, upper=N_areas&gt; N_data;          // number of districts with data
+  int&lt;lower=1&gt; cohort[N_data];                 // number of students
+  int&lt;lower=0&gt; grads[N_data];                  // number of graduates
+  int&lt;lower=1, upper=N_areas&gt; id[N_data];      // district id
+  
+  int&lt;lower=1&gt; N_edges;                        // # of edges in adjacency graph
+  int&lt;lower=1, upper=N_areas&gt; node1[N_edges];  // node1[i], node2[i] are districts
+  int&lt;lower=1, upper=N_areas&gt; node2[N_edges];  //   and node1[i] &lt; node2[i]
+  
+  real&lt;lower=0&gt; scaling_factor;
+}
+parameters {
+  real Intercept;
+  vector[N_areas] spatial;     // spatial effects
+  vector[N_areas] hetero;      // heterogeneous effects
+  
+  real&lt;lower=0, upper=1&gt; phi;  // proportion of variance from spatial effects
+  real&lt;lower=0&gt; sigma;         // scale of convolved effects
+}
+transformed parameters {
+  // varying intercept (convolution of spatial &amp; heterogeneous effects)
+  vector[N_areas] convolved_re;
+  convolved_re = (sqrt(phi/scaling_factor)*spatial + sqrt(1-phi)*hetero)*sigma;
+}
+model {
+  // linear model
+  vector[N_data] mu = Intercept + convolved_re[id];
+  
+  // priors for random effects
+  spatial ~ icar_normal(N_areas, node1, node2);
+  hetero ~ std_normal();
+  phi ~ beta(2, 4);
+  sigma ~ exponential(1);
+  
+  // priors for linear model
+  Intercept ~ student_t(3, 1, 5);
+  
+  // likelihood
+  grads ~ binomial_logit(cohort, mu);
+}
+generated quantities {
+  // posterior latent graduation rates
+  vector[N_areas] grad_rate = inv_logit(Intercept + convolved_re);
+}</code></pre>
+<p>Note that our priors for <span class="math inline">\(\phi\)</span> and <span class="math inline">\(\sigma\)</span> are</p>
+<p><span class="math display">\[
+\phi \sim \operatorname{Beta}(2, 4) \qquad \text{and} \qquad \sigma \sim \operatorname{Exponential}(1).
+\]</span></p>
+<p>The last thing we need to do is compute the scaling factor for the ICAR component. We’ll rely on some functions from the INLA package for this. The code chunk below essentially computes adjacency matrix for our school districts, replaces its diagonal with neighbor counts, then finds a generalized inverse of that matrix satisfying a certain sum-to-zero constraint.</p>
+<p>The idea behind this computation is that the matrix <code>Q_inv</code> is actually the variance matrix of the ICAR component of the model. We then take the geometric mean of its diagonal as the scaling factor we need to make <span class="math inline">\(\operatorname{Var}(\xi^*) = 1\)</span>.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>Q <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">inla.graph2matrix</span>(graph)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">diag</span>(Q) <span class="ot">&lt;-</span> graph<span class="sc">$</span>nnbs  <span class="co"># replace diagonal with neighbor counts</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">dim</span>(Q)[<span class="dv">1</span>]  <span class="co"># number of nodes</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>Q_inv <span class="ot">&lt;-</span> <span class="fu">inla.qinv</span>(</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  Q <span class="sc">+</span> <span class="fu">Diagonal</span>(n)<span class="sc">*</span><span class="fu">max</span>(<span class="fu">diag</span>(Q))<span class="sc">*</span><span class="fu">sqrt</span>(.Machine<span class="sc">$</span>double.eps),  <span class="co"># add perturbation</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">constr =</span> <span class="fu">list</span>(<span class="at">A =</span> <span class="fu">matrix</span>(<span class="fu">rep</span>(<span class="dv">1</span>, n), <span class="at">nrow =</span> <span class="dv">1</span>), <span class="at">e =</span> <span class="dv">0</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>scaling_factor <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">mean</span>(<span class="fu">log</span>(<span class="fu">diag</span>(Q_inv))))  <span class="co"># geometric mean of diag(Q^-1)</span></span></code></pre></div>
+<p>Oh, one more thing. We need lists of which school districts are adjacent to which others.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>node1 <span class="ot">&lt;-</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(nbhds), <span class="cf">function</span>(i) <span class="fu">rep</span>(i, <span class="fu">sum</span>(nbhds[[i]] <span class="sc">&gt;</span> i))) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unlist</span>()</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>node2 <span class="ot">&lt;-</span> </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(nbhds),</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(i) {</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>      i_neighbors <span class="ot">&lt;-</span> nbhds[[i]]</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(i_neighbors[i_neighbors <span class="sc">&gt;</span> i])</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unlist</span>()</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cbind</span>(node1, node2)[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,]</span></code></pre></div>
+<pre><code>##       node1 node2
+##  [1,]     1     9
+##  [2,]     1    11
+##  [3,]     1    90
+##  [4,]     1   107
+##  [5,]     1   108
+##  [6,]     1   184
+##  [7,]     2    11
+##  [8,]     2    35
+##  [9,]     2    80
+## [10,]     2    81</code></pre>
+<p>For example, this says that district 1 in the data is adjacent to districts 9, 11, 90, 107, 108, and 184.</p>
+<p>Finally we compile and fit the model.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>spatial_model <span class="ot">&lt;-</span> <span class="fu">cmdstan_model</span>(<span class="st">&quot;spatial_binomial.stan&quot;</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>or_grad_complete <span class="ot">&lt;-</span> </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  or_grad <span class="sc">%&gt;%</span> </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(cohort <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>fit_stan <span class="ot">&lt;-</span> spatial_model<span class="sc">$</span><span class="fu">sample</span>(</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">N_areas =</span> <span class="fu">nrow</span>(or_grad),</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">N_data =</span> <span class="fu">nrow</span>(or_grad_complete),</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">N_edges =</span> <span class="fu">length</span>(node1),</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">cohort =</span> or_grad_complete<span class="sc">$</span>cohort,</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">grads =</span> or_grad_complete<span class="sc">$</span>grads,</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">id =</span> or_grad_complete<span class="sc">$</span>idarea,</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">node1 =</span> node1,</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">node2 =</span> node2,</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">scaling_factor =</span> scaling_factor</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_warmup =</span> <span class="fl">1e3</span>,</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_sampling =</span> <span class="fl">1e4</span>,</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">parallel_chains =</span> <span class="dv">4</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Let’s take a look at the summary for a few parameters.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>fit_stan<span class="sc">$</span><span class="fu">summary</span>(<span class="fu">c</span>(<span class="st">&quot;Intercept&quot;</span>, <span class="st">&quot;phi&quot;</span>, <span class="st">&quot;sigma&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.numeric, round, <span class="dv">2</span>)</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["variable"],"name":[1],"type":["chr"],"align":["left"]},{"label":["mean"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["median"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["sd"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["mad"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["q5"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["q95"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["rhat"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["ess_bulk"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["ess_tail"],"name":[10],"type":["dbl"],"align":["right"]}],"data":[{"1":"Intercept","2":"1.61","3":"1.61","4":"0.05","5":"0.05","6":"1.52","7":"1.70","8":"1","9":"15312.23","10":"23006.08"},{"1":"phi","2":"0.40","3":"0.39","4":"0.15","5":"0.16","6":"0.16","7":"0.65","8":"1","9":"2565.91","10":"5999.39"},{"1":"sigma","2":"0.71","3":"0.71","4":"0.06","5":"0.06","6":"0.62","7":"0.81","8":"1","9":"6030.10","10":"13838.34"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>Our estimate for <code>phi</code> is different from INLA’s estimate, but that’s to be expected since we used a different prior for it. The INLA model uses a ‘complexity penalizing’ prior, while we just used a Beta.</p>
+<p>Before we get to the graduation rate estimates from the Stan model, I want to point out that the Stan model samples the posterior of <code>phi</code> very well. If you try to make the graph below using the posterior samples from the INLA model, you’ll see that those samples are only taken at widely-spaced discrete points within the interval. The Stan model, on the other hand, gives us a full picture:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>stan_draws <span class="ot">&lt;-</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  fit_stan<span class="sc">$</span><span class="fu">draws</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_draws_df</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">merge_chains</span>()</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>stan_draws <span class="sc">%&gt;%</span> </span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(phi)) <span class="sc">+</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_function</span>(</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">fun =</span> <span class="cf">function</span>(x) <span class="fu">dbeta</span>(x, <span class="at">shape1 =</span> <span class="dv">2</span>, <span class="at">shape2 =</span> <span class="dv">4</span>),</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>,</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;blue&quot;</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">label =</span> label),</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">tribble</span>(</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span>x,  <span class="sc">~</span>y,  <span class="sc">~</span>label,</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>      <span class="co">#----------------</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>      <span class="fl">0.1</span>, <span class="dv">2</span>,   <span class="st">&quot;prior&quot;</span>,</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>      <span class="fl">0.6</span>, <span class="fl">2.1</span>, <span class="st">&quot;posterior&quot;</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;phi (proportion of variation explained by spatial correlation)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;density&quot;</span>) <span class="sc">+</span></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span></code></pre></div>
+<p><img src="spatial_grad_rates_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>We can even plot the joint posterior of <code>phi</code> and <code>sigma</code>.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>stan_draws <span class="sc">%&gt;%</span> </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hex</span>(<span class="fu">aes</span>(<span class="at">x =</span> phi, <span class="at">y =</span> sigma, <span class="at">fill =</span> ..density.., <span class="at">color =</span> ..density..)) <span class="sc">+</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Joint posterior of the hyperparameters&quot;</span>)</span></code></pre></div>
+<p><img src="spatial_grad_rates_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>See how nice their posterior geometry is? It’s unimodal and pretty much radially symmetric. The fact that this geometry is so easy to sample from (or otherwise approximate) is a huge advantage of the BYM2 parameterization.</p>
+<p>Ok, on to the posterior graduation rates. Below we join them to the district geometries. If we wanted, we could map them just like the INLA estimates.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>or_grad_stan_posterior <span class="ot">&lt;-</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  stan_draws <span class="sc">%&gt;%</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;grad_rate&quot;</span>), .chain, .iteration, .draw) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise_draws</span>(</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean =</span> mean,</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span><span class="fu">quantile</span>(.x, <span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>))</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">lower =</span> <span class="st">`</span><span class="at">2.5%</span><span class="st">`</span>, <span class="at">upper =</span> <span class="st">`</span><span class="at">97.5%</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    or_grad <span class="sc">%&gt;%</span> </span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(NAME, cohort, grads, grad_rate),</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    .</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(NAME, cohort, grads, grad_rate, mean, lower, upper)</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>or_grad_stan_posterior <span class="sc">%&gt;%</span> </span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>geometry) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(mean, lower, upper), <span class="sc">~</span><span class="fu">round</span>(<span class="dv">100</span><span class="sc">*</span>., <span class="dv">2</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(NAME)</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["NAME"],"name":[1],"type":["chr"],"align":["left"]},{"label":["cohort"],"name":[2],"type":["int"],"align":["right"]},{"label":["grads"],"name":[3],"type":["int"],"align":["right"]},{"label":["grad_rate"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["mean"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["lower"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["upper"],"name":[7],"type":["dbl"],"align":["right"]}],"data":[{"1":"Adel School District 21","2":"1","3":"1","4":"100.00","5":"83.29","6":"59.33","7":"96.06"},{"1":"Adrian School District 61","2":"17","3":"17","4":"100.00","5":"92.70","6":"82.27","7":"98.23"},{"1":"Alsea School District 7J","2":"38","3":"18","4":"47.37","5":"55.35","6":"41.06","7":"68.99"},{"1":"Amity School District 4J","2":"74","3":"61","4":"82.43","5":"82.77","6":"74.49","7":"89.53"},{"1":"Annex School District 29","2":"7","3":"0","4":"0.00","5":"52.66","6":"27.25","7":"76.54"},{"1":"Arlington School District 3","2":"13","3":"10","4":"76.92","5":"82.98","6":"66.70","7":"93.79"},{"1":"Arock School District 81","2":"0","3":"0","4":"NA","5":"84.14","6":"62.65","7":"95.71"},{"1":"Ashland School District 5","2":"217","3":"198","4":"91.24","5":"90.46","6":"86.43","7":"93.86"},{"1":"Ashwood School District 8","2":"1","3":"1","4":"100.00","5":"82.20","6":"59.57","7":"95.17"},{"1":"Astoria School District 1","2":"134","3":"111","4":"82.84","5":"82.45","6":"75.97","7":"88.07"},{"1":"Athena-Weston School District 29J","2":"48","3":"40","4":"83.33","5":"83.67","6":"73.73","7":"91.47"},{"1":"Baker School District 5J","2":"511","3":"398","4":"77.89","5":"78.19","6":"74.61","7":"81.54"},{"1":"Bandon School District 54","2":"44","3":"36","4":"81.82","5":"80.13","6":"68.94","7":"89.21"},{"1":"Banks School District 13","2":"106","3":"97","4":"91.51","5":"89.98","6":"84.25","7":"94.47"},{"1":"Beaverton School District 48J","2":"3219","3":"2845","4":"88.38","5":"88.37","6":"87.25","7":"89.45"},{"1":"Bend-La Pine Administrative School District 1","2":"1485","3":"1223","4":"82.36","5":"82.35","6":"80.35","7":"84.25"},{"1":"Bethel School District 52","2":"414","3":"348","4":"84.06","5":"83.90","6":"80.28","7":"87.24"},{"1":"Blachly School District 090","2":"15","3":"12","4":"80.00","5":"78.68","6":"62.11","7":"90.80"},{"1":"Black Butte School District 41","2":"2","3":"1","4":"50.00","5":"79.08","6":"55.98","7":"93.29"},{"1":"Brookings-Harbor School District 17","2":"122","3":"95","4":"77.87","5":"77.84","6":"70.32","7":"84.53"},{"1":"Burnt River School District 30J","2":"7","3":"5","4":"71.43","5":"81.22","6":"62.58","7":"93.32"},{"1":"Butte Falls School District 91","2":"22","3":"14","4":"63.64","5":"69.03","6":"51.91","7":"83.44"},{"1":"Camas Valley School District 21J","2":"14","3":"11","4":"78.57","5":"76.76","6":"59.16","7":"89.76"},{"1":"Canby School District 86","2":"355","3":"283","4":"79.72","5":"80.05","6":"75.84","7":"83.95"},{"1":"Cascade School District 5","2":"188","3":"158","4":"84.04","5":"84.03","6":"78.76","7":"88.67"},{"1":"Centennial School District 28J","2":"465","3":"342","4":"73.55","5":"73.79","6":"69.76","7":"77.60"},{"1":"Central Curry School District 1","2":"44","3":"34","4":"77.27","5":"77.27","6":"65.43","7":"87.06"},{"1":"Central Linn School District 552","2":"46","3":"38","4":"82.61","5":"82.27","6":"72.02","7":"90.41"},{"1":"Central Point School District 6","2":"313","3":"245","4":"78.27","5":"78.30","6":"73.68","7":"82.54"},{"1":"Central School District 13J","2":"233","3":"199","4":"85.41","5":"85.19","6":"80.52","7":"89.28"},{"1":"Clatskanie School District 6J","2":"67","3":"45","4":"67.16","5":"69.12","6":"58.48","7":"78.76"},{"1":"Colton School District 53","2":"56","3":"55","4":"98.21","5":"93.60","6":"87.78","7":"97.48"},{"1":"Condon School District 25J","2":"12","3":"11","4":"91.67","5":"88.00","6":"74.73","7":"96.08"},{"1":"Coos Bay School District 9","2":"229","3":"152","4":"66.38","5":"66.91","6":"60.89","7":"72.71"},{"1":"Coquille School District 8","2":"172","3":"89","4":"51.74","5":"53.11","6":"45.85","7":"60.33"},{"1":"Corbett School District 39","2":"79","3":"72","4":"91.14","5":"89.33","6":"82.69","7":"94.43"},{"1":"Corvallis School District 509J","2":"560","3":"494","4":"88.21","5":"87.95","6":"85.16","7":"90.48"},{"1":"Cove School District 15","2":"21","3":"18","4":"85.71","5":"85.91","6":"73.47","7":"94.28"},{"1":"Creswell School District 40","2":"81","3":"67","4":"82.72","5":"82.24","6":"74.13","7":"89.00"},{"1":"Crook County School District","2":"235","3":"208","4":"88.51","5":"88.05","6":"83.86","7":"91.71"},{"1":"Crow-Applegate-Lorane Sd 66","2":"22","3":"17","4":"77.27","5":"78.04","6":"63.50","7":"89.50"},{"1":"Culver School District 4","2":"49","3":"45","4":"91.84","5":"89.33","6":"81.23","7":"95.09"},{"1":"Dallas School District 2","2":"232","3":"188","4":"81.03","5":"81.11","6":"76.04","7":"85.66"},{"1":"David Douglas School District 40","2":"745","3":"538","4":"72.21","5":"72.39","6":"69.15","7":"75.51"},{"1":"Days Creek School District 15","2":"22","3":"18","4":"81.82","5":"80.27","6":"66.21","7":"90.85"},{"1":"Dayton School District 8","2":"100","3":"79","4":"79.00","5":"79.94","6":"72.15","7":"86.69"},{"1":"Dayville School District 16J","2":"5","3":"5","4":"100.00","5":"86.54","6":"70.45","7":"95.90"},{"1":"Diamond School District 7","2":"0","3":"0","4":"NA","5":"82.58","6":"58.00","7":"95.63"},{"1":"Double O School District 28","2":"0","3":"0","4":"NA","5":"81.96","6":"56.20","7":"95.61"},{"1":"Drewsey School District 13","2":"0","3":"0","4":"NA","5":"83.35","6":"60.99","7":"95.51"},{"1":"Dufur School District 29","2":"28","3":"25","4":"89.29","5":"87.06","6":"75.98","7":"94.72"},{"1":"Eagle Point School District 9","2":"316","3":"255","4":"80.70","5":"80.68","6":"76.28","7":"84.73"},{"1":"Echo School District 5","2":"18","3":"17","4":"94.44","5":"89.62","6":"78.62","7":"96.44"},{"1":"Elgin School District 23","2":"42","3":"30","4":"71.43","5":"75.68","6":"63.61","7":"85.81"},{"1":"Elkton School District 34","2":"23","3":"22","4":"95.65","5":"87.79","6":"76.55","7":"95.28"},{"1":"Enterprise School District 21","2":"23","3":"22","4":"95.65","5":"91.33","6":"81.31","7":"97.35"},{"1":"Estacada School District 108","2":"417","3":"364","4":"87.29","5":"87.17","6":"83.91","7":"90.09"},{"1":"Eugene School District 4J","2":"1491","3":"1175","4":"78.81","5":"78.83","6":"76.73","7":"80.83"},{"1":"Falls City School District 57","2":"25","3":"19","4":"76.00","5":"77.31","6":"62.52","7":"88.89"},{"1":"Fern Ridge School District 28J","2":"113","3":"88","4":"77.88","5":"78.03","6":"70.58","7":"84.58"},{"1":"Forest Grove School District 15","2":"475","3":"375","4":"78.95","5":"79.15","6":"75.43","7":"82.64"},{"1":"Fossil School District 21J","2":"1","3":"0","4":"0.00","5":"79.60","6":"56.96","7":"93.44"},{"1":"Frenchglen School District 16","2":"0","3":"0","4":"NA","5":"82.54","6":"60.13","7":"95.11"},{"1":"Gaston School District 511J","2":"50","3":"47","4":"94.00","5":"90.75","6":"83.31","7":"95.98"},{"1":"Gervais School District 1","2":"128","3":"103","4":"80.47","5":"80.93","6":"74.12","7":"86.85"},{"1":"Gladstone School District 115","2":"143","3":"123","4":"86.01","5":"86.17","6":"80.47","7":"91.05"},{"1":"Glendale School District 77","2":"23","3":"19","4":"82.61","5":"79.96","6":"66.14","7":"90.47"},{"1":"Glide School District 12","2":"54","3":"49","4":"90.74","5":"87.33","6":"78.99","7":"93.68"},{"1":"Grants Pass School District 7","2":"487","3":"376","4":"77.21","5":"77.23","6":"73.43","7":"80.80"},{"1":"Greater Albany School District 8J","2":"736","3":"588","4":"79.89","5":"79.95","6":"77.02","7":"82.67"},{"1":"Gresham-Barlow School District 1J","2":"1067","3":"791","4":"74.13","5":"74.26","6":"71.62","7":"76.81"},{"1":"Harney County School District 3","2":"50","3":"43","4":"86.00","5":"85.41","6":"76.01","7":"92.54"},{"1":"Harney County School District 4","2":"18","3":"10","4":"55.56","5":"69.50","6":"51.82","7":"84.17"},{"1":"Harper School District 66","2":"16","3":"15","4":"93.75","5":"88.96","6":"77.35","7":"96.20"},{"1":"Harrisburg School District 7J","2":"64","3":"55","4":"85.94","5":"84.72","6":"76.27","7":"91.44"},{"1":"Helix School District 1","2":"7","3":"7","4":"100.00","5":"88.22","6":"73.85","7":"96.48"},{"1":"Hermiston School District 8","2":"399","3":"351","4":"87.97","5":"87.93","6":"84.62","7":"90.87"},{"1":"Hillsboro School District 1J","2":"1551","3":"1282","4":"82.66","5":"82.72","6":"80.82","7":"84.56"},{"1":"Hood River County School District 1","2":"336","3":"304","4":"90.48","5":"90.08","6":"86.77","7":"92.94"},{"1":"Huntington School District 16J","2":"5","3":"3","4":"60.00","5":"78.17","6":"55.97","7":"92.42"},{"1":"Imbler School District 11","2":"20","3":"20","4":"100.00","5":"91.58","6":"81.91","7":"97.34"},{"1":"Ione School District 2","2":"12","3":"12","4":"100.00","5":"90.96","6":"78.97","7":"97.54"},{"1":"Jefferson County School District 509J","2":"211","3":"179","4":"84.83","5":"84.79","6":"79.87","7":"89.10"},{"1":"Jefferson School District 14J","2":"66","3":"58","4":"87.88","5":"86.66","6":"78.76","7":"92.86"},{"1":"Jewell School District 8","2":"7","3":"7","4":"100.00","5":"84.86","6":"68.00","7":"95.20"},{"1":"John Day School District 3","2":"32","3":"29","4":"90.63","5":"88.01","6":"78.09","7":"94.85"},{"1":"Jordan Valley School District 3","2":"6","3":"6","4":"100.00","5":"89.44","6":"74.89","7":"97.20"},{"1":"Joseph School District 6","2":"24","3":"22","4":"91.67","5":"89.43","6":"78.82","7":"96.22"},{"1":"Junction City School District 69","2":"133","3":"110","4":"82.71","5":"82.41","6":"75.98","7":"87.98"},{"1":"Juntura School District 12","2":"0","3":"0","4":"NA","5":"83.88","6":"62.51","7":"95.56"},{"1":"Klamath County School District","2":"468","3":"365","4":"77.99","5":"78.12","6":"74.30","7":"81.73"},{"1":"Klamath Falls City Schools","2":"273","3":"201","4":"73.63","5":"73.82","6":"68.50","7":"78.76"},{"1":"Knappa School District 4","2":"30","3":"25","4":"83.33","5":"81.78","6":"68.67","7":"91.60"},{"1":"La Grande School District 1","2":"157","3":"135","4":"85.99","5":"86.06","6":"80.54","7":"90.73"},{"1":"Lake Oswego School District 7J","2":"608","3":"592","4":"97.37","5":"96.76","6":"95.31","7":"97.97"},{"1":"Lakeview School District 7","2":"54","3":"48","4":"88.89","5":"87.22","6":"78.59","7":"93.69"},{"1":"Lebanon Community School District 9","2":"286","3":"221","4":"77.27","5":"77.53","6":"72.67","7":"82.03"},{"1":"Lincoln County School District","2":"441","3":"255","4":"57.82","5":"58.45","6":"53.90","7":"62.95"},{"1":"Long Creek School District 17","2":"6","3":"5","4":"83.33","5":"85.13","6":"68.31","7":"95.15"},{"1":"Lowell School District 71","2":"58","3":"50","4":"86.21","5":"84.77","6":"75.80","7":"91.82"},{"1":"Mapleton School District 32","2":"17","3":"9","4":"52.94","5":"62.97","6":"44.50","7":"79.31"},{"1":"Marcola School District 79J","2":"51","3":"36","4":"70.59","5":"72.88","6":"61.30","7":"82.91"},{"1":"McKenzie School District 68","2":"13","3":"9","4":"69.23","5":"76.17","6":"58.56","7":"89.37"},{"1":"McMinnville School District 40","2":"516","3":"478","4":"92.64","5":"92.24","6":"89.91","7":"94.30"},{"1":"Medford School District 549","2":"972","3":"801","4":"82.41","5":"82.37","6":"79.93","7":"84.66"},{"1":"Milton-Freewater School District 7","2":"118","3":"88","4":"74.58","5":"75.91","6":"68.29","7":"82.82"},{"1":"Mitchell School District 55","2":"157","3":"63","4":"40.13","5":"43.39","6":"35.96","7":"50.93"},{"1":"Molalla River School District 35","2":"187","3":"163","4":"87.17","5":"87.07","6":"82.14","7":"91.28"},{"1":"Monroe School District 1J","2":"32","3":"27","4":"84.38","5":"82.80","6":"71.21","7":"91.64"},{"1":"Monument School District 8","2":"7","3":"7","4":"100.00","5":"88.58","6":"73.76","7":"96.80"},{"1":"Morrow School District 1","2":"163","3":"157","4":"96.32","5":"94.49","6":"91.04","7":"97.12"},{"1":"Mount Angel School District 91","2":"47","3":"36","4":"76.60","5":"78.25","6":"67.04","7":"87.59"},{"1":"Myrtle Point School District 41","2":"33","3":"31","4":"93.94","5":"86.92","6":"76.52","7":"94.38"},{"1":"Neah-Kah-Nie School District 56","2":"62","3":"53","4":"85.48","5":"84.66","6":"75.95","7":"91.64"},{"1":"Nestucca Valley School District 101J","2":"46","3":"36","4":"78.26","5":"79.03","6":"67.89","7":"88.23"},{"1":"Newberg School District 29J","2":"385","3":"333","4":"86.49","5":"86.49","6":"83.01","7":"89.61"},{"1":"North Bend School District 13","2":"452","3":"276","4":"61.06","5":"61.36","6":"56.85","7":"65.76"},{"1":"North Clackamas School District 12","2":"1461","3":"1289","4":"88.23","5":"88.19","6":"86.51","7":"89.77"},{"1":"North Douglas School District 22","2":"11","3":"8","4":"72.73","5":"76.33","6":"57.44","7":"90.12"},{"1":"North Lake School District 14","2":"23","3":"19","4":"82.61","5":"82.66","6":"69.20","7":"92.26"},{"1":"North Marion School District 15","2":"152","3":"122","4":"80.26","5":"80.76","6":"74.42","7":"86.38"},{"1":"North Powder School District 8J","2":"20","3":"16","4":"80.00","5":"82.70","6":"68.64","7":"92.75"},{"1":"North Santiam School District 29J","2":"179","3":"152","4":"84.92","5":"84.75","6":"79.41","7":"89.34"},{"1":"North Wasco School District 21","2":"235","3":"157","4":"66.81","5":"67.66","6":"61.62","7":"73.38"},{"1":"Nyssa School District 26","2":"88","3":"77","4":"87.50","5":"87.58","6":"80.68","7":"93.04"},{"1":"Oakland School District 1","2":"56","3":"55","4":"98.21","5":"92.06","6":"85.48","7":"96.63"},{"1":"Oakridge School District 76","2":"42","3":"31","4":"73.81","5":"75.71","6":"63.65","7":"85.73"},{"1":"Ontario School District 8","2":"180","3":"157","4":"87.22","5":"86.96","6":"81.88","7":"91.31"},{"1":"Oregon City School District 62","2":"629","3":"548","4":"87.12","5":"87.12","6":"84.49","7":"89.56"},{"1":"Oregon Trail School District 46","2":"348","3":"307","4":"88.22","5":"88.03","6":"84.56","7":"91.11"},{"1":"Paisley School District 11","2":"7","3":"6","4":"85.71","5":"82.81","6":"63.81","7":"94.55"},{"1":"Parkrose School District 3","2":"297","3":"216","4":"72.73","5":"73.09","6":"68.01","7":"77.92"},{"1":"Pendleton School District 16","2":"241","3":"182","4":"75.52","5":"76.33","6":"71.03","7":"81.28"},{"1":"Perrydale School District 21","2":"22","3":"22","4":"100.00","5":"91.04","6":"81.28","7":"96.96"},{"1":"Philomath School District 17J","2":"147","3":"132","4":"89.80","5":"88.55","6":"83.35","7":"92.83"},{"1":"Phoenix-Talent School District 4","2":"184","3":"170","4":"92.39","5":"91.38","6":"87.28","7":"94.74"},{"1":"Pilot Rock School District 2","2":"29","3":"24","4":"82.76","5":"84.35","6":"72.61","7":"92.91"},{"1":"Pine-Eagle School District 61","2":"18","3":"17","4":"94.44","5":"89.34","6":"77.90","7":"96.44"},{"1":"Pine Creek School District 5","2":"0","3":"0","4":"NA","5":"82.86","6":"59.43","7":"95.56"},{"1":"Pinehurst School District 94","2":"0","3":"0","4":"NA","5":"80.78","6":"52.64","7":"95.73"},{"1":"Pleasant Hill School District 1","2":"84","3":"74","4":"88.10","5":"86.70","6":"79.56","7":"92.45"},{"1":"Plush School District 18","2":"0","3":"0","4":"NA","5":"82.34","6":"56.39","7":"95.99"},{"1":"Port Orford-Langlois School District 2J","2":"11","3":"10","4":"90.91","5":"82.28","6":"65.21","7":"93.63"},{"1":"Portland School District 1J","2":"3503","3":"2955","4":"84.36","5":"84.36","6":"83.14","7":"85.54"},{"1":"Powers School District 31","2":"6","3":"3","4":"50.00","5":"68.35","6":"44.67","7":"86.59"},{"1":"Prairie City School District 4","2":"16","3":"15","4":"93.75","5":"88.34","6":"76.58","7":"95.72"},{"1":"Prospect School District 59","2":"22","3":"14","4":"63.64","5":"69.26","6":"52.62","7":"83.31"},{"1":"Rainier School District 13","2":"72","3":"43","4":"59.72","5":"62.54","6":"51.80","7":"72.66"},{"1":"Redmond School District 2J","2":"679","3":"580","4":"85.42","5":"85.39","6":"82.67","7":"87.90"},{"1":"Reedsport School District 105","2":"47","3":"35","4":"74.47","5":"74.92","6":"63.36","7":"84.70"},{"1":"Reynolds School District 7","2":"788","3":"450","4":"57.11","5":"57.48","6":"54.06","7":"60.87"},{"1":"Riddle School District 70","2":"24","3":"14","4":"58.33","5":"64.02","6":"47.29","7":"78.82"},{"1":"Riverdale School District 51J","2":"64","3":"60","4":"93.75","5":"91.96","6":"85.49","7":"96.50"},{"1":"Rogue River School District 35","2":"105","3":"71","4":"67.62","5":"68.86","6":"60.25","7":"76.93"},{"1":"Roseburg School District 4","2":"488","3":"338","4":"69.26","5":"69.50","6":"65.36","7":"73.45"},{"1":"Salem-Keizer School District 24J","2":"3237","3":"2619","4":"80.91","5":"80.92","6":"79.55","7":"82.25"},{"1":"Santiam Canyon School District 129J","2":"717","3":"403","4":"56.21","5":"56.77","6":"53.17","7":"60.38"},{"1":"Scappoose School District 1J","2":"167","3":"145","4":"86.83","5":"86.28","6":"81.01","7":"90.75"},{"1":"Scio School District 95","2":"105","3":"84","4":"80.00","5":"80.36","6":"72.87","7":"86.89"},{"1":"Seaside School District 10","2":"124","3":"96","4":"77.42","5":"77.80","6":"70.45","7":"84.37"},{"1":"Sheridan School District 48J","2":"96","3":"77","4":"80.21","5":"80.89","6":"73.09","7":"87.57"},{"1":"Sherman School District 1","2":"13","3":"12","4":"92.31","5":"87.76","6":"74.56","7":"95.91"},{"1":"Sherwood School District 88J","2":"394","3":"382","4":"96.95","5":"96.16","6":"94.18","7":"97.72"},{"1":"Silver Falls School District 4J","2":"350","3":"324","4":"92.57","5":"91.92","6":"88.96","7":"94.43"},{"1":"Sisters School District 6","2":"113","3":"106","4":"93.81","5":"91.90","6":"86.92","7":"95.73"},{"1":"Siuslaw School District 97J","2":"100","3":"66","4":"66.00","5":"66.94","6":"57.79","7":"75.54"},{"1":"South Harney School District 33","2":"0","3":"0","4":"NA","5":"82.72","6":"56.79","7":"96.03"},{"1":"South Lane School District 45J","2":"223","3":"154","4":"69.06","5":"69.84","6":"63.87","7":"75.50"},{"1":"South Umpqua School District 19","2":"90","3":"62","4":"68.89","5":"69.95","6":"60.73","7":"78.36"},{"1":"South Wasco County School District 1","2":"21","3":"19","4":"90.48","5":"87.45","6":"76.04","7":"95.08"},{"1":"Spray School District 1","2":"2","3":"2","4":"100.00","5":"84.91","6":"65.60","7":"95.65"},{"1":"Springfield School District 19","2":"777","3":"582","4":"74.90","5":"75.03","6":"71.92","7":"78.00"},{"1":"St. Helens School District 502","2":"216","3":"154","4":"71.30","5":"71.74","6":"65.62","7":"77.46"},{"1":"St. Paul School District 45","2":"24","3":"23","4":"95.83","5":"89.76","6":"79.78","7":"96.19"},{"1":"Stanfield School District 61","2":"38","3":"35","4":"92.11","5":"89.85","6":"81.02","7":"95.86"},{"1":"Suntex School District 10","2":"0","3":"0","4":"NA","5":"82.57","6":"60.18","7":"95.01"},{"1":"Sutherlin School District 130","2":"105","3":"77","4":"73.33","5":"74.06","6":"65.78","7":"81.60"},{"1":"Sweet Home School District 55","2":"159","3":"131","4":"82.39","5":"82.36","6":"76.39","7":"87.60"},{"1":"Three Rivers School District","2":"350","3":"270","4":"77.14","5":"77.17","6":"72.72","7":"81.28"},{"1":"Tigard-Tualatin School District 23J","2":"985","3":"869","4":"88.22","5":"88.23","6":"86.13","7":"90.16"},{"1":"Tillamook School District 9","2":"185","3":"152","4":"82.16","5":"82.31","6":"76.74","7":"87.28"},{"1":"Troy School District 54","2":"0","3":"0","4":"NA","5":"86.29","6":"62.35","7":"97.49"},{"1":"Ukiah School District 80","2":"2","3":"2","4":"100.00","5":"86.63","6":"69.37","7":"96.26"},{"1":"Umatilla School District 6","2":"111","3":"90","4":"81.08","5":"81.85","6":"74.61","7":"88.07"},{"1":"Union School District 5","2":"34","3":"32","4":"94.12","5":"90.53","6":"81.85","7":"96.20"},{"1":"Vale School District 84","2":"69","3":"67","4":"97.10","5":"93.31","6":"87.66","7":"97.18"},{"1":"Vernonia School District 47J","2":"41","3":"30","4":"73.17","5":"75.08","6":"62.70","7":"85.29"},{"1":"Wallowa School District 12","2":"20","3":"18","4":"90.00","5":"88.00","6":"76.49","7":"95.54"},{"1":"Warrenton-Hammond School District 30","2":"65","3":"46","4":"70.77","5":"72.31","6":"61.81","7":"81.63"},{"1":"West Linn School District 3J","2":"775","3":"736","4":"94.97","5":"94.64","6":"93.03","7":"96.06"},{"1":"Willamina School District 30J","2":"57","3":"47","4":"82.46","5":"82.35","6":"72.68","7":"90.02"},{"1":"Winston-Dillard School District 116","2":"120","3":"79","4":"65.83","5":"66.80","6":"58.45","7":"74.59"},{"1":"Woodburn School District 103","2":"407","3":"306","4":"75.18","5":"75.56","6":"71.38","7":"79.56"},{"1":"Yamhill-Carlton School District 1","2":"77","3":"62","4":"80.52","5":"81.29","6":"72.86","7":"88.30"},{"1":"Yoncalla School District 32","2":"50","3":"39","4":"78.00","5":"78.42","6":"67.50","7":"87.50"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>For now, I’ll just join the INLA estiamtes and the Stan estimates for comparison.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_cols</span>(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  or_grad_inla_posterior <span class="sc">%&gt;%</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(NAME, grad_rate, cohort, grads, <span class="at">inla_estimate =</span> mean),</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  or_grad_stan_posterior <span class="sc">%&gt;%</span> </span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="at">stan_estimate =</span> mean)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(inla_estimate, stan_estimate), <span class="sc">~</span><span class="fu">round</span>(<span class="dv">100</span><span class="sc">*</span>., <span class="dv">2</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(NAME, inla_estimate, stan_estimate, grad_rate, cohort, grads) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(NAME)</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["NAME"],"name":[1],"type":["chr"],"align":["left"]},{"label":["inla_estimate"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["stan_estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["grad_rate"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["cohort"],"name":[5],"type":["int"],"align":["right"]},{"label":["grads"],"name":[6],"type":["int"],"align":["right"]}],"data":[{"1":"Adel School District 21","2":"83.20","3":"83.29","4":"100.00","5":"1","6":"1"},{"1":"Adrian School District 61","2":"92.29","3":"92.70","4":"100.00","5":"17","6":"17"},{"1":"Alsea School District 7J","2":"55.32","3":"55.35","4":"47.37","5":"38","6":"18"},{"1":"Amity School District 4J","2":"82.50","3":"82.77","4":"82.43","5":"74","6":"61"},{"1":"Annex School District 29","2":"52.64","3":"52.66","4":"0.00","5":"7","6":"0"},{"1":"Arlington School District 3","2":"82.55","3":"82.98","4":"76.92","5":"13","6":"10"},{"1":"Arock School District 81","2":"84.13","3":"84.14","4":"NA","5":"0","6":"0"},{"1":"Ashland School District 5","2":"90.32","3":"90.46","4":"91.24","5":"217","6":"198"},{"1":"Ashwood School District 8","2":"81.97","3":"82.20","4":"100.00","5":"1","6":"1"},{"1":"Astoria School District 1","2":"82.26","3":"82.45","4":"82.84","5":"134","6":"111"},{"1":"Athena-Weston School District 29J","2":"83.27","3":"83.67","4":"83.33","5":"48","6":"40"},{"1":"Baker School District 5J","2":"78.12","3":"78.19","4":"77.89","5":"511","6":"398"},{"1":"Bandon School District 54","2":"79.79","3":"80.13","4":"81.82","5":"44","6":"36"},{"1":"Banks School District 13","2":"89.73","3":"89.98","4":"91.51","5":"106","6":"97"},{"1":"Beaverton School District 48J","2":"88.36","3":"88.37","4":"88.38","5":"3219","6":"2845"},{"1":"Bend-La Pine Administrative School District 1","2":"82.34","3":"82.35","4":"82.36","5":"1485","6":"1223"},{"1":"Bethel School District 52","2":"83.84","3":"83.90","4":"84.06","5":"414","6":"348"},{"1":"Blachly School District 090","2":"78.20","3":"78.68","4":"80.00","5":"15","6":"12"},{"1":"Black Butte School District 41","2":"78.94","3":"79.08","4":"50.00","5":"2","6":"1"},{"1":"Brookings-Harbor School District 17","2":"77.67","3":"77.84","4":"77.87","5":"122","6":"95"},{"1":"Burnt River School District 30J","2":"80.88","3":"81.22","4":"71.43","5":"7","6":"5"},{"1":"Butte Falls School District 91","2":"68.59","3":"69.03","4":"63.64","5":"22","6":"14"},{"1":"Camas Valley School District 21J","2":"76.29","3":"76.76","4":"78.57","5":"14","6":"11"},{"1":"Canby School District 86","2":"79.98","3":"80.05","4":"79.72","5":"355","6":"283"},{"1":"Cascade School District 5","2":"83.87","3":"84.03","4":"84.04","5":"188","6":"158"},{"1":"Centennial School District 28J","2":"73.73","3":"73.79","4":"73.55","5":"465","6":"342"},{"1":"Central Curry School District 1","2":"76.96","3":"77.27","4":"77.27","5":"44","6":"34"},{"1":"Central Linn School District 552","2":"81.93","3":"82.27","4":"82.61","5":"46","6":"38"},{"1":"Central Point School District 6","2":"78.22","3":"78.30","4":"78.27","5":"313","6":"245"},{"1":"Central School District 13J","2":"85.08","3":"85.19","4":"85.41","5":"233","6":"199"},{"1":"Clatskanie School District 6J","2":"68.91","3":"69.12","4":"67.16","5":"67","6":"45"},{"1":"Colton School District 53","2":"93.33","3":"93.60","4":"98.21","5":"56","6":"55"},{"1":"Condon School District 25J","2":"87.64","3":"88.00","4":"91.67","5":"12","6":"11"},{"1":"Coos Bay School District 9","2":"66.84","3":"66.91","4":"66.38","5":"229","6":"152"},{"1":"Coquille School District 8","2":"53.11","3":"53.11","4":"51.74","5":"172","6":"89"},{"1":"Corbett School District 39","2":"89.04","3":"89.33","4":"91.14","5":"79","6":"72"},{"1":"Corvallis School District 509J","2":"87.89","3":"87.95","4":"88.21","5":"560","6":"494"},{"1":"Cove School District 15","2":"85.47","3":"85.91","4":"85.71","5":"21","6":"18"},{"1":"Creswell School District 40","2":"81.98","3":"82.24","4":"82.72","5":"81","6":"67"},{"1":"Crook County School District","2":"87.91","3":"88.05","4":"88.51","5":"235","6":"208"},{"1":"Crow-Applegate-Lorane Sd 66","2":"77.58","3":"78.04","4":"77.27","5":"22","6":"17"},{"1":"Culver School District 4","2":"89.00","3":"89.33","4":"91.84","5":"49","6":"45"},{"1":"Dallas School District 2","2":"81.00","3":"81.11","4":"81.03","5":"232","6":"188"},{"1":"David Douglas School District 40","2":"72.37","3":"72.39","4":"72.21","5":"745","6":"538"},{"1":"Days Creek School District 15","2":"79.77","3":"80.27","4":"81.82","5":"22","6":"18"},{"1":"Dayton School District 8","2":"79.74","3":"79.94","4":"79.00","5":"100","6":"79"},{"1":"Dayville School District 16J","2":"86.23","3":"86.54","4":"100.00","5":"5","6":"5"},{"1":"Diamond School District 7","2":"82.51","3":"82.58","4":"NA","5":"0","6":"0"},{"1":"Double O School District 28","2":"81.92","3":"81.96","4":"NA","5":"0","6":"0"},{"1":"Drewsey School District 13","2":"83.38","3":"83.35","4":"NA","5":"0","6":"0"},{"1":"Dufur School District 29","2":"86.65","3":"87.06","4":"89.29","5":"28","6":"25"},{"1":"Eagle Point School District 9","2":"80.60","3":"80.68","4":"80.70","5":"316","6":"255"},{"1":"Echo School District 5","2":"89.27","3":"89.62","4":"94.44","5":"18","6":"17"},{"1":"Elgin School District 23","2":"75.34","3":"75.68","4":"71.43","5":"42","6":"30"},{"1":"Elkton School District 34","2":"87.43","3":"87.79","4":"95.65","5":"23","6":"22"},{"1":"Enterprise School District 21","2":"90.92","3":"91.33","4":"95.65","5":"23","6":"22"},{"1":"Estacada School District 108","2":"87.09","3":"87.17","4":"87.29","5":"417","6":"364"},{"1":"Eugene School District 4J","2":"78.81","3":"78.83","4":"78.81","5":"1491","6":"1175"},{"1":"Falls City School District 57","2":"76.79","3":"77.31","4":"76.00","5":"25","6":"19"},{"1":"Fern Ridge School District 28J","2":"77.86","3":"78.03","4":"77.88","5":"113","6":"88"},{"1":"Forest Grove School District 15","2":"79.10","3":"79.15","4":"78.95","5":"475","6":"375"},{"1":"Fossil School District 21J","2":"79.48","3":"79.60","4":"0.00","5":"1","6":"0"},{"1":"Frenchglen School District 16","2":"82.56","3":"82.54","4":"NA","5":"0","6":"0"},{"1":"Gaston School District 511J","2":"90.41","3":"90.75","4":"94.00","5":"50","6":"47"},{"1":"Gervais School District 1","2":"80.74","3":"80.93","4":"80.47","5":"128","6":"103"},{"1":"Gladstone School District 115","2":"85.98","3":"86.17","4":"86.01","5":"143","6":"123"},{"1":"Glendale School District 77","2":"79.54","3":"79.96","4":"82.61","5":"23","6":"19"},{"1":"Glide School District 12","2":"86.99","3":"87.33","4":"90.74","5":"54","6":"49"},{"1":"Grants Pass School District 7","2":"77.17","3":"77.23","4":"77.21","5":"487","6":"376"},{"1":"Greater Albany School District 8J","2":"79.92","3":"79.95","4":"79.89","5":"736","6":"588"},{"1":"Gresham-Barlow School District 1J","2":"74.25","3":"74.26","4":"74.13","5":"1067","6":"791"},{"1":"Harney County School District 3","2":"85.03","3":"85.41","4":"86.00","5":"50","6":"43"},{"1":"Harney County School District 4","2":"69.21","3":"69.50","4":"55.56","5":"18","6":"10"},{"1":"Harper School District 66","2":"88.60","3":"88.96","4":"93.75","5":"16","6":"15"},{"1":"Harrisburg School District 7J","2":"84.41","3":"84.72","4":"85.94","5":"64","6":"55"},{"1":"Helix School District 1","2":"87.88","3":"88.22","4":"100.00","5":"7","6":"7"},{"1":"Hermiston School District 8","2":"87.85","3":"87.93","4":"87.97","5":"399","6":"351"},{"1":"Hillsboro School District 1J","2":"82.69","3":"82.72","4":"82.66","5":"1551","6":"1282"},{"1":"Hood River County School District 1","2":"89.98","3":"90.08","4":"90.48","5":"336","6":"304"},{"1":"Huntington School District 16J","2":"77.72","3":"78.17","4":"60.00","5":"5","6":"3"},{"1":"Imbler School District 11","2":"91.23","3":"91.58","4":"100.00","5":"20","6":"20"},{"1":"Ione School District 2","2":"90.63","3":"90.96","4":"100.00","5":"12","6":"12"},{"1":"Jefferson County School District 509J","2":"84.64","3":"84.79","4":"84.83","5":"211","6":"179"},{"1":"Jefferson School District 14J","2":"86.33","3":"86.66","4":"87.88","5":"66","6":"58"},{"1":"Jewell School District 8","2":"84.48","3":"84.86","4":"100.00","5":"7","6":"7"},{"1":"John Day School District 3","2":"87.64","3":"88.01","4":"90.63","5":"32","6":"29"},{"1":"Jordan Valley School District 3","2":"89.17","3":"89.44","4":"100.00","5":"6","6":"6"},{"1":"Joseph School District 6","2":"89.06","3":"89.43","4":"91.67","5":"24","6":"22"},{"1":"Junction City School District 69","2":"82.24","3":"82.41","4":"82.71","5":"133","6":"110"},{"1":"Juntura School District 12","2":"83.90","3":"83.88","4":"NA","5":"0","6":"0"},{"1":"Klamath County School District","2":"78.06","3":"78.12","4":"77.99","5":"468","6":"365"},{"1":"Klamath Falls City Schools","2":"73.75","3":"73.82","4":"73.63","5":"273","6":"201"},{"1":"Knappa School District 4","2":"81.31","3":"81.78","4":"83.33","5":"30","6":"25"},{"1":"La Grande School District 1","2":"85.89","3":"86.06","4":"85.99","5":"157","6":"135"},{"1":"Lake Oswego School District 7J","2":"96.70","3":"96.76","4":"97.37","5":"608","6":"592"},{"1":"Lakeview School District 7","2":"86.88","3":"87.22","4":"88.89","5":"54","6":"48"},{"1":"Lebanon Community School District 9","2":"77.43","3":"77.53","4":"77.27","5":"286","6":"221"},{"1":"Lincoln County School District","2":"58.44","3":"58.45","4":"57.82","5":"441","6":"255"},{"1":"Long Creek School District 17","2":"84.81","3":"85.13","4":"83.33","5":"6","6":"5"},{"1":"Lowell School District 71","2":"84.44","3":"84.77","4":"86.21","5":"58","6":"50"},{"1":"Mapleton School District 32","2":"62.68","3":"62.97","4":"52.94","5":"17","6":"9"},{"1":"Marcola School District 79J","2":"72.62","3":"72.88","4":"70.59","5":"51","6":"36"},{"1":"McKenzie School District 68","2":"75.79","3":"76.17","4":"69.23","5":"13","6":"9"},{"1":"McMinnville School District 40","2":"92.17","3":"92.24","4":"92.64","5":"516","6":"478"},{"1":"Medford School District 549","2":"82.34","3":"82.37","4":"82.41","5":"972","6":"801"},{"1":"Milton-Freewater School District 7","2":"75.74","3":"75.91","4":"74.58","5":"118","6":"88"},{"1":"Mitchell School District 55","2":"43.44","3":"43.39","4":"40.13","5":"157","6":"63"},{"1":"Molalla River School District 35","2":"86.91","3":"87.07","4":"87.17","5":"187","6":"163"},{"1":"Monroe School District 1J","2":"82.40","3":"82.80","4":"84.38","5":"32","6":"27"},{"1":"Monument School District 8","2":"88.36","3":"88.58","4":"100.00","5":"7","6":"7"},{"1":"Morrow School District 1","2":"94.33","3":"94.49","4":"96.32","5":"163","6":"157"},{"1":"Mount Angel School District 91","2":"77.89","3":"78.25","4":"76.60","5":"47","6":"36"},{"1":"Myrtle Point School District 41","2":"86.52","3":"86.92","4":"93.94","5":"33","6":"31"},{"1":"Neah-Kah-Nie School District 56","2":"84.32","3":"84.66","4":"85.48","5":"62","6":"53"},{"1":"Nestucca Valley School District 101J","2":"78.64","3":"79.03","4":"78.26","5":"46","6":"36"},{"1":"Newberg School District 29J","2":"86.40","3":"86.49","4":"86.49","5":"385","6":"333"},{"1":"North Bend School District 13","2":"61.32","3":"61.36","4":"61.06","5":"452","6":"276"},{"1":"North Clackamas School District 12","2":"88.16","3":"88.19","4":"88.23","5":"1461","6":"1289"},{"1":"North Douglas School District 22","2":"75.94","3":"76.33","4":"72.73","5":"11","6":"8"},{"1":"North Lake School District 14","2":"82.29","3":"82.66","4":"82.61","5":"23","6":"19"},{"1":"North Marion School District 15","2":"80.57","3":"80.76","4":"80.26","5":"152","6":"122"},{"1":"North Powder School District 8J","2":"82.21","3":"82.70","4":"80.00","5":"20","6":"16"},{"1":"North Santiam School District 29J","2":"84.59","3":"84.75","4":"84.92","5":"179","6":"152"},{"1":"North Wasco School District 21","2":"67.61","3":"67.66","4":"66.81","5":"235","6":"157"},{"1":"Nyssa School District 26","2":"87.34","3":"87.58","4":"87.50","5":"88","6":"77"},{"1":"Oakland School District 1","2":"91.75","3":"92.06","4":"98.21","5":"56","6":"55"},{"1":"Oakridge School District 76","2":"75.40","3":"75.71","4":"73.81","5":"42","6":"31"},{"1":"Ontario School District 8","2":"86.81","3":"86.96","4":"87.22","5":"180","6":"157"},{"1":"Oregon City School District 62","2":"87.06","3":"87.12","4":"87.12","5":"629","6":"548"},{"1":"Oregon Trail School District 46","2":"87.93","3":"88.03","4":"88.22","5":"348","6":"307"},{"1":"Paisley School District 11","2":"82.41","3":"82.81","4":"85.71","5":"7","6":"6"},{"1":"Parkrose School District 3","2":"73.00","3":"73.09","4":"72.73","5":"297","6":"216"},{"1":"Pendleton School District 16","2":"76.26","3":"76.33","4":"75.52","5":"241","6":"182"},{"1":"Perrydale School District 21","2":"90.65","3":"91.04","4":"100.00","5":"22","6":"22"},{"1":"Philomath School District 17J","2":"88.34","3":"88.55","4":"89.80","5":"147","6":"132"},{"1":"Phoenix-Talent School District 4","2":"91.20","3":"91.38","4":"92.39","5":"184","6":"170"},{"1":"Pilot Rock School District 2","2":"83.89","3":"84.35","4":"82.76","5":"29","6":"24"},{"1":"Pine-Eagle School District 61","2":"88.93","3":"89.34","4":"94.44","5":"18","6":"17"},{"1":"Pine Creek School District 5","2":"82.82","3":"82.86","4":"NA","5":"0","6":"0"},{"1":"Pinehurst School District 94","2":"80.81","3":"80.78","4":"NA","5":"0","6":"0"},{"1":"Pleasant Hill School District 1","2":"86.41","3":"86.70","4":"88.10","5":"84","6":"74"},{"1":"Plush School District 18","2":"82.30","3":"82.34","4":"NA","5":"0","6":"0"},{"1":"Port Orford-Langlois School District 2J","2":"81.85","3":"82.28","4":"90.91","5":"11","6":"10"},{"1":"Portland School District 1J","2":"84.36","3":"84.36","4":"84.36","5":"3503","6":"2955"},{"1":"Powers School District 31","2":"68.25","3":"68.35","4":"50.00","5":"6","6":"3"},{"1":"Prairie City School District 4","2":"87.98","3":"88.34","4":"93.75","5":"16","6":"15"},{"1":"Prospect School District 59","2":"68.88","3":"69.26","4":"63.64","5":"22","6":"14"},{"1":"Rainier School District 13","2":"62.39","3":"62.54","4":"59.72","5":"72","6":"43"},{"1":"Redmond School District 2J","2":"85.34","3":"85.39","4":"85.42","5":"679","6":"580"},{"1":"Reedsport School District 105","2":"74.61","3":"74.92","4":"74.47","5":"47","6":"35"},{"1":"Reynolds School District 7","2":"57.48","3":"57.48","4":"57.11","5":"788","6":"450"},{"1":"Riddle School District 70","2":"63.74","3":"64.02","4":"58.33","5":"24","6":"14"},{"1":"Riverdale School District 51J","2":"91.66","3":"91.96","4":"93.75","5":"64","6":"60"},{"1":"Rogue River School District 35","2":"68.68","3":"68.86","4":"67.62","5":"105","6":"71"},{"1":"Roseburg School District 4","2":"69.46","3":"69.50","4":"69.26","5":"488","6":"338"},{"1":"Salem-Keizer School District 24J","2":"80.92","3":"80.92","4":"80.91","5":"3237","6":"2619"},{"1":"Santiam Canyon School District 129J","2":"56.77","3":"56.77","4":"56.21","5":"717","6":"403"},{"1":"Scappoose School District 1J","2":"86.09","3":"86.28","4":"86.83","5":"167","6":"145"},{"1":"Scio School District 95","2":"80.14","3":"80.36","4":"80.00","5":"105","6":"84"},{"1":"Seaside School District 10","2":"77.61","3":"77.80","4":"77.42","5":"124","6":"96"},{"1":"Sheridan School District 48J","2":"80.68","3":"80.89","4":"80.21","5":"96","6":"77"},{"1":"Sherman School District 1","2":"87.37","3":"87.76","4":"92.31","5":"13","6":"12"},{"1":"Sherwood School District 88J","2":"96.07","3":"96.16","4":"96.95","5":"394","6":"382"},{"1":"Silver Falls School District 4J","2":"91.81","3":"91.92","4":"92.57","5":"350","6":"324"},{"1":"Sisters School District 6","2":"91.67","3":"91.90","4":"93.81","5":"113","6":"106"},{"1":"Siuslaw School District 97J","2":"66.81","3":"66.94","4":"66.00","5":"100","6":"66"},{"1":"South Harney School District 33","2":"82.70","3":"82.72","4":"NA","5":"0","6":"0"},{"1":"South Lane School District 45J","2":"69.77","3":"69.84","4":"69.06","5":"223","6":"154"},{"1":"South Umpqua School District 19","2":"69.78","3":"69.95","4":"68.89","5":"90","6":"62"},{"1":"South Wasco County School District 1","2":"87.07","3":"87.45","4":"90.48","5":"21","6":"19"},{"1":"Spray School District 1","2":"84.66","3":"84.91","4":"100.00","5":"2","6":"2"},{"1":"Springfield School District 19","2":"75.00","3":"75.03","4":"74.90","5":"777","6":"582"},{"1":"St. Helens School District 502","2":"71.64","3":"71.74","4":"71.30","5":"216","6":"154"},{"1":"St. Paul School District 45","2":"89.31","3":"89.76","4":"95.83","5":"24","6":"23"},{"1":"Stanfield School District 61","2":"89.45","3":"89.85","4":"92.11","5":"38","6":"35"},{"1":"Suntex School District 10","2":"82.65","3":"82.57","4":"NA","5":"0","6":"0"},{"1":"Sutherlin School District 130","2":"73.88","3":"74.06","4":"73.33","5":"105","6":"77"},{"1":"Sweet Home School District 55","2":"82.18","3":"82.36","4":"82.39","5":"159","6":"131"},{"1":"Three Rivers School District","2":"77.11","3":"77.17","4":"77.14","5":"350","6":"270"},{"1":"Tigard-Tualatin School District 23J","2":"88.20","3":"88.23","4":"88.22","5":"985","6":"869"},{"1":"Tillamook School District 9","2":"82.14","3":"82.31","4":"82.16","5":"185","6":"152"},{"1":"Troy School District 54","2":"86.32","3":"86.29","4":"NA","5":"0","6":"0"},{"1":"Ukiah School District 80","2":"86.48","3":"86.63","4":"100.00","5":"2","6":"2"},{"1":"Umatilla School District 6","2":"81.63","3":"81.85","4":"81.08","5":"111","6":"90"},{"1":"Union School District 5","2":"90.19","3":"90.53","4":"94.12","5":"34","6":"32"},{"1":"Vale School District 84","2":"93.03","3":"93.31","4":"97.10","5":"69","6":"67"},{"1":"Vernonia School District 47J","2":"74.79","3":"75.08","4":"73.17","5":"41","6":"30"},{"1":"Wallowa School District 12","2":"87.59","3":"88.00","4":"90.00","5":"20","6":"18"},{"1":"Warrenton-Hammond School District 30","2":"72.13","3":"72.31","4":"70.77","5":"65","6":"46"},{"1":"West Linn School District 3J","2":"94.59","3":"94.64","4":"94.97","5":"775","6":"736"},{"1":"Willamina School District 30J","2":"82.02","3":"82.35","4":"82.46","5":"57","6":"47"},{"1":"Winston-Dillard School District 116","2":"66.69","3":"66.80","4":"65.83","5":"120","6":"79"},{"1":"Woodburn School District 103","2":"75.50","3":"75.56","4":"75.18","5":"407","6":"306"},{"1":"Yamhill-Carlton School District 1","2":"81.03","3":"81.29","4":"80.52","5":"77","6":"62"},{"1":"Yoncalla School District 32","2":"78.11","3":"78.42","4":"78.00","5":"50","6":"39"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>On the whole, the INLA and Stan estimates are very similar, as expected.</p>
+<p>The main point of fitting the Stan model was to better understand the BYM2 model. Typically I would use INLA for this type of problem since it’s so fast. That said, knowing that I can implement it in Stan if I need some additional flexibility beyond what INLA can offer is comforting. Getting a fuller picture of the posterior for <code>phi</code> is nice too.</p>
+<hr />
+<p><a href="https://mathstat.dal.ca/~antoniov/">Antonio R. Vargas</a></p>
+<p>27 March 2022</p>
+<script type="text/javascript">
+// This is javascript to make the headers go back to the TOC when clicked. 
+$('h1,h2,h3').click(function(){
+window.scrollTo(0, 0);
+window.location.hash="";
+});
+</script>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+  
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+  <title>Asymptotic bound for a particular sum - Antonio Vargas</title>
+
+  
+  
+  <link rel="stylesheet" type="text/css" href="math.css">
+
+  
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+  
+  <script type="text/x-mathjax-config">
+MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+  </script>
+</head><body style="margin: 25px auto; width: 740px;">
+<a href="http://mathstat.dal.ca/%7Eantoniov/"><img style="border: 0px solid ; width: 740px; height: 35px;" src="escher740.png" alt="back to main"></a><br>
+
+<br>
+
+<font style="font-family: Times New Roman;" size="+2">Zeros
+of sections of exponential integrals</font><br style="font-family: Times New Roman;">
+
+<br style="font-family: Times New Roman;">
+
+<span style="font-family: Times New Roman;"></span>For
+complex $z$, define the function
+\[ F_a(z) = \int_{a-1}^a \left(t-\frac{1}{2}\right)^2 e^{zt}\,dt \] and
+let \[ s_n[F_a](z) = \sum_{k=0}^{n} \frac{z^k}{k!} \int_{a-1}^a
+\left(t-\frac{1}{2}\right)^2 t^k\,dt \] be the $n^{\text{th}}$ partial
+sum of its Maclaurin series. We refer to $s_n[F_a](z)$ as
+the $n^{\text{th}}$ section of the exponential integral
+$F_a(z)$.<br>
+
+<br>
+
+As
+$n \to \infty$, most zeros of the sections $s_n[F_a](z)$ grow on the
+order of $O(n)$. Consequently we rescale, replacing $z$ by
+$nz$,
+and instead consider the zeros of the <span style="font-style: italic;">normalized</span>
+sections $s_n[F_a](nz)$. The complex zeros of these
+normalized sections accumulate
+on the curve \[ \begin{align*} D(a) &amp;= \left\{z \in \mathbb{C}
+\,\colon
+\Re(z) \leq 0,\,\,\, |z| \leq \frac{2}{|1-2a|+1},\,\,\, \text{and }
+\left|ze^{1-(1-a)z}\right| = \frac{2}{|1-2a|+1}\right\} \\
+&amp;\qquad \cup \,\left\{z \in \mathbb{C}
+\,\colon \Re(z) \geq 0,\,\,\, |z|
+\leq \frac{2}{|1-2a|+1},\,\,\, \text{and }
+\left|ze^{1-az}\right| = \frac{2}{|1-2a|+1}\right\} \\
+&amp;\qquad \cup \,\left\{z \in \mathbb{C}
+\,\colon \Re(z) = 0 \,\,\,\text{and}\,\,\, |z|
+\leq \frac{2}{(|1-2a|+1)e}
+\right\}, \end{align*} \] which consists of two bulbous components, one
+in each
+half-plane, and a line segment on the imaginary axis. This
+curve $D(a)$ is called the Szegő
+curve for the function $F_a$.<br>
+
+<br>
+
+Below is an image which shows the zeros of the first $40$
+normalized sections (that is, the zeros of $s_n[F_a](nz)$ for
+$n=1,2,\ldots,40$) and their Szegő curve $D(a)$. The
+parameter $a$ ranges from $0$ to $1$ and back to $0$ in the animation.
+If we
+were to plot the zeros of more sections they would cluster nearer and
+nearer to the Szegő curve.<br>
+
+<br>
+
+<img class="" src="szego.gif" alt=""><br>
+
+<br>
+
+For more information about this plot and the information above you can
+check out <a class="" href="http://arxiv.org/abs/1208.5186">my
+master's thesis</a> and <a href="http://arxiv.org/abs/1302.3695">this
+paper</a>.<br>
+
+<br>
+
+<hr style="width: 100%; height: 2px;"><br>
+
+<a href="http://mathstat.dal.ca/%7Eantoniov/">Antonio R.
+Vargas</a><br>
+
+February 18, 2013<br>
+
+<br>
+
+<br>
+
+</body></html>

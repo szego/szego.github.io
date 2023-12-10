@@ -1,0 +1,67 @@
+ul.paren {
+list-style:none;
+margin-left:2em;
+padding-left:1em;
+text-indent:-1.5em;
+}
+
+#outer {
+width:740px;
+display:table-cell;
+vertical-align:middle;
+}
+
+#inner {
+width:602px;
+border:1px dashed orange;
+margin:auto;
+padding:12px 18px 6px;
+}
+
+#inner2 {
+width:602px;
+border:1px dashed orange;
+margin:auto;
+padding:12px 18px;
+}
+
+#qed {
+font-size:0;
+line-height:0;
+width:0;
+border-top:10px solid #000;
+border-bottom:none;
+border-right:10px solid #000;
+}
+
+.section {
+font-size:1.5em;
+color:#000;
+text-decoration:none;
+}
+
+.subsection {
+font-size:1.3em;
+color:#000;
+text-decoration:none;
+}
+
+.prob {
+color:#000;
+font-weight:700;
+text-decoration:none;
+}
+
+.citation {
+color:blue;
+font-weight:700;
+text-decoration:none;
+}
+
+.section:hover,.subsection:hover,.prob:hover {
+border-bottom:1px solid #000;
+}
+
+.eqref {
+color:#000;
+}

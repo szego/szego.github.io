@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta content="text/html; charset=UTF-8" http-equiv="content-type">
+		<title>An overview of my github commits - Antonio Vargas</title>
+		<link rel="stylesheet" type="text/css" href="math.css">
+		<link rel="stylesheet" type="text/css" href="body.css">
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full"> </script>
+		<script type="text/x-mathjax-config">
+			MathJax.Hub.Config({
+				tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+			});
+		</script>
+		<style>
+			body {
+				font-family:Georgia;
+				font-size:16px;
+			}
+			
+			.tsection {
+				font-size:1.7em;
+			}
+
+			.tsubsection {
+				font-size:1.3em;
+			}
+		</style>
+	</head>
+	<body style="margin: 25px auto; width: 900px;">
+    <a href="http://mathstat.dal.ca/%7Eantoniov/"><img src="escher900.png" alt="back to main"></a><br>
+    <br>
+    <div class="tsection">An overview of my work on github</div> <br>
+    <br>
+    Here's a summary of my own repositories and my contributions to the repos of others.<br>
+    <br>
+    <br>
+    <div class="tsection">My repositories</div> <br>
+	<br>
+	<a href="https://github.com/szego/oha-births" class="tsubsection">Processing OHA's Final Method of Delivery Data</a> <br>
+	<br>
+	The Oregon Health Authority (OHA) publishes <a href="https://www.oregon.gov/oha/PH/BIRTHDEATHCERTIFICATES/VITALSTATISTICS/BIRTH/Pages/index.aspx">statistics on births in Oregon by county</a> each year in PDF format. The goal of this project is to programmatically read and process all of their "Final Method of Delivery by Facility" PDFs into a format that can be easily analyzed using standard statistical software.<br>
+	<br>
+  <br>
+	<a href="https://github.com/szego/ermise" class="tsubsection">ermise (R package)</a> <br>
+	<br>
+	This R package provides a set of tools and workflow enhancements for data processing and analysis projects based on a folder structure recommended by <a href="https://emilyriederer.netlify.app/post/team-of-packages/">Emily Riederer</a>. The package name "ermise" stands for Emily Riederer Mise en place.<br>
+	<br>
+  <br>
+	<a href="https://github.com/szego/cdnce" class="tsubsection">cdnce (R package)</a> <br>
+	<br>
+	cdnce (“cadence”) modifies generated .html pages so that they load JavaScript and CSS resources from remote CDNs instead of from local files. This can greatly reduce their strain on your bandwidth.<br><br>
+  cdnce is not yet ready for public use, though I do use it in my own work.<br>
+	<br>
+  <br>
+	<a href="https://github.com/szego/cassoulet" class="tsubsection">cassoulet (R package)</a> <br>
+	<br>
+	This R package contains helper functions for blending predictions from multiple models or multiple datasets when using <a href="https://www.tidymodels.org/">tidymodels</a>. It is generally not ready for public use, though I do use it in my own work.<br>
+	<br>
+  <br>
+	<a href="https://github.com/szego/SE-CommentPreview" class="tsubsection">SE Comment Preview</a> <br>
+	<br>
+	An attempt to add real-time previewing when composing comments on Stack Exchange sites. This is especially helpful on math-heavy sites like <a href="https://math.stackexchange.com/">Math.SE</a> where you can expect to write a lot of LaTeX in comments. Further info and screenshots can be found at the repo.<br>
+	<br>
+	<br>
+    <a href="https://github.com/szego/BDA-singalong" class="tsubsection">BDA Singalong</a> <br>
+	<br>
+	As a means for learning the R package <a href="https://github.com/paul-buerkner/brms">brms</a>, I'll be using it to model various examples and solve various exercises in the book <a href="http://www.stat.columbia.edu/~gelman/book/">Bayesian Data Analysis</a> by Gelman, Carlin, Stern, Dunson, Vehtari, and Rubin. <br>
+    <br>
+    <br>
+	<a href="https://github.com/szego/ANTSD-solutions-python" class="tsubsection">ANTSD Solutions in Python</a> <br>
+	<br>
+	I'm working through Mike X Cohen's book <a href="http://mikexcohen.com/#books">Analyzing Neural Time Series Data: Theory and Practice</a>, solving the exercises in Python with the help of packages like <a href="https://martinos.org/mne/stable/index.html">MNE</a>. <br>
+    <br>
+	<br>
+	<div class="tsection">Repos I've contributed to</div> <br>
+	<br>
+	<a href="https://github.com/pfrater/arcpullr/" class = "tsubsection">arcpullr</a> <br>
+	<br>
+	Wrote two pull requests (PRs <a href="https://github.com/pfrater/arcpullr/pull/12">#12</a> and <a href="https://github.com/pfrater/arcpullr/pull/13">#13</a>) that fixed a bug where not all records were retrieved and added a new function, get_table_layer(), that can retrieve tables that don't have geometry associated with them. My code was accepted and merged into main on Mar 12, 2023.
+	<br>
+  <br>
+	<a href="https://github.com/tidymodels/probably" class = "tsubsection">probably (tidymodels)</a> <br>
+	<br>
+	<a href="https://github.com/tidymodels/probably/pull/37">Wrote a pull request</a> that adds the option for the user to specify which metrics are computed in <a href="https://probably.tidymodels.org/reference/threshold_perf.html">threshold_perf()</a>. My code was accepted and <a href="https://github.com/tidymodels/probably/pull/66">merged into main on Jan 6, 2023.<br>
+	<br>
+  <br>
+	<a href="https://github.com/szego/SE-Answers_scripts" class = "tsubsection">SE Answers Scripts</a> <br>
+	<br>
+	Extended and improved side-by-side editing for composing questions and answers on Stack Exchange. These scripts later became <a href="https://github.com/soscripted/sox">Stack Overflow Extras</a>. <br>
+	<br>
+	<br>
+    <hr style="width: 100%; height: 2px;"><br>
+    <a href="http://mathstat.dal.ca/%7Eantoniov/">Antonio R. Vargas</a><br>
+    Updated Mar 22, 2023<br>
+    <br>
+    <br>
+  </body>
+</html>

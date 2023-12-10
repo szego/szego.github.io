@@ -1,0 +1,390 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+  
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+  <title>On calculating a "Mathematically Correct Breakfast" - Antonio
+Vargas</title>
+
+  
+  
+  <link rel="stylesheet" type="text/css" href="math.css">
+
+  
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+  
+  <script type="text/x-mathjax-config">
+MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+  </script>
+</head><body style="margin: 25px auto; width: 740px;">
+<a href="http://mathstat.dal.ca/%7Eantoniov/"><img style="border: 0px solid ; width: 740px; height: 35px;" src="escher740.png" alt="back to main"></a><br>
+
+<br>
+
+<font style="font-family: Times New Roman;" size="+2">On
+calculating a "Mathematically Correct Breakfast"</font><br>
+
+<br>
+
+A friend of mine recently sent me a link to this video by George W.
+Hart in
+which he cuts a bagel into two interlocking rings.<br>
+
+<br>
+
+<div style="text-align: center;"><iframe src="https://www.youtube.com/embed/dN8AwGUaqDA?rel=0" allow="autoplay; encrypted-media" allowfullscreen="" frameborder="0" height="390" width="640"></iframe></div>
+
+<br>
+
+After toasting the bagel rings George wonders about how much surface
+area he has available for cream cheese. &nbsp;Is there more or less
+compared to the usual method of just slicing the bagel straight in half?<br>
+
+<br>
+
+To answer this question we first need to visualize exactly how George
+is cutting the bagel. &nbsp;Let's assume the bagel is perfectly
+round -- let's assume it's a torus, to be precise. &nbsp;We'll also
+assume he's cutting the bagel perfectly evenly. &nbsp;If we looked
+closely, we'd find that he's
+actually cutting the bagel in half along a two-twist Möbius strip.
+&nbsp;This
+cut is shown in the image below.<br>
+
+<br>
+
+<div style="text-align: center;"><img style="width: 550px; height: 350px;" alt="The mobius strip cut into the bagel" src="bagelrings_pics/mobius.png"></div>
+
+<br>
+
+<font style="font-family: Times New Roman;" size="+2">
+Calculating the area of the two-twist Möbius strip</font><br>
+
+<br>
+
+We'll need some equations to describe the bagel. &nbsp;The <a href="http://en.wikipedia.org/wiki/Torus#Geometry">Wikipedia
+article for the torus</a> provides us with a parameterization,
+given by<br>
+
+\[
+\begin{align*}
+&amp; x = (R + r\cos \varphi) \cos \theta \\
+&amp; y = (R + r\cos \varphi) \sin \theta \\
+&amp; z = r \sin \varphi,
+\end{align*}
+\]
+where $R$ is the distance from the center of the torus to the center of
+the tube and $r$ is the radius of the tube. Each point on the torus
+$(x,y,z)$ is represented by a single combination of the parameters
+$\theta$ and $\varphi$, each of which lie between $0$ to $2\pi$.
+&nbsp;In order for this to represent a physical bagel we can't
+allow any self-intersections, so we'll also require the diameter of the
+tube to be less than half the diameter of the torus, which is the same
+as requiring $0 &lt; r \leq R$.<br>
+
+<br>
+
+Using this parameterization for the torus we can obtain a
+parameterization for the möbius strip inside it. &nbsp;In the
+formula above we'll replace $r$ with $\rho$ and let $\rho$ to vary from
+$-r$ to $r$, allowing us to cross from one side of the tube to the
+other through its center. &nbsp;Furthermore, the cut completes a
+full twist before returning to its starting point, so to capture this
+we'll also set $\varphi = \theta$.<br>
+
+<br>
+
+The (vector form) parameterization of the two-twist Möbius strip is
+thus
+\[
+\gamma(\rho,\theta) = \Bigl\langle (R + \rho \cos\theta) \cos\theta,\
+(R + \rho \cos\theta) \sin\theta,\ \rho \sin\theta \Bigr\rangle.
+\]
+Wikipedia provides us with the formula to calculate the <a href="http://en.wikipedia.org/wiki/Parametric_surface#Surface_area">surface
+area of
+a parameterized surface</a>, and in our case we can express the
+surface area of the two-twist Möbius strip as
+\[
+A_\text{Möb}(R,r) = \int_0^{2\pi} \!\int_{-r}^r
+\,\left|\frac{\partial\gamma}{\partial\rho} \times
+\frac{\partial\gamma}{\partial\theta}
+\right|\,d\rho d\theta.
+\]
+After some work we calculate
+\[
+\left|\frac{\partial\gamma}{\partial\rho} \times
+\frac{\partial\gamma}{\partial\theta}
+\right|^2 = R^2 + 2R\rho\cos\theta + \frac{1}{2} \rho^2 (3 + \cos
+2\theta),
+\]
+so that
+\[
+A_\text{Möb}(R,r) = \int_0^{2\pi} \!\int_{-r}^r
+\,\sqrt{R^2 + 2R\rho\cos\theta + \frac{1}{2} \rho^2 (3 + \cos
+2\theta)}
+\,d\rho d\theta. \tag{1}
+\]
+This integral we've arrived at seems fairly intractable (Mathematica
+throws up its hands in frustration) but there is still much we can
+learn from it.<br>
+
+<br>
+
+<font style="font-family: Times New Roman;" size="+2">How
+much more surface area can we get?</font><br>
+
+<br>
+
+If you recall, our goal in all this is to compare the amount of cream
+cheeseable surface area revealed by cutting along the two-twist Möbius
+strip to the amount revealed by cutting the bagel straight in half.
+&nbsp;We've obtained an expression for the former amount, and of
+course we'll need to calculate the latter amount as well.
+&nbsp;Luckily this task is much simpler than the work we did above.<br>
+
+<br>
+
+The surface exposed by cutting a bagel straight in half is a disk with
+a hole in the center. &nbsp;In the notation from the previous
+section, the outer ring of the disk has radius $R+r$ and the inner ring
+has radius $R - r$, so all together the surface area is the difference
+of the areas of these two circles,
+\[
+A_\text{flat}(R,r) = \pi(R+r)^2 - \pi(R-r)^2 = 4\pi Rr.
+\]
+We can now write down the ratio of these two surface areas. Using the
+expression from equaiton $(1)$ we have
+\[
+\begin{align*}
+\frac{A_\text{Möb}(R,r)}{A_\text{flat}(R,r)} &amp;= \frac{1}{4\pi
+Rr}
+\int_0^{2\pi} \!\int_{-r}^r\,\sqrt{R^2 + 2R\rho\cos\theta + \frac{1}{2}
+\rho^2 (3 + \cos 2\theta)} \,d\rho d\theta \\
+&amp;= \frac{1}{4\pi r} \int_0^{2\pi} \!\int_{-r}^r\,\sqrt{1 +
+2\frac{\rho}{R}\cos\theta + \frac{1}{2}
+\frac{\rho^2}{R^2} (3 + \cos 2\theta)} \,d\rho d\theta \\
+&amp;= \frac{1}{4\pi} \int_0^{2\pi} \!\int_{-1}^1\,\sqrt{1 +
+2\frac{r}{R}\sigma\cos\theta + \frac{1}{2} \left(\frac{r}{R}\right)^2
+\sigma^2 (3 + \cos 2\theta)} \,d\sigma d\theta \tag{2},
+\end{align*}
+\]
+where in the second line we factored an $R$ out of the square root and
+in the third line we made the change of variables $\rho = r\sigma$ in
+the inner integral.
+<br>
+
+<br>
+
+This expression is quite interesting. For starters it tells
+us the following fact.<br>
+
+<br>
+
+<div id="outer">
+<div id="inner2"><b>Proposition 1.</b>
+The ratio of the surface areas
+$A_\text{Möb}(R,r)/A_\text{flat}(R,r)$ depends only on the ratio of the
+radii $r/R$.
+</div>
+</div>
+
+<br>
+
+In particular, as long as the ratio $r/R$ is held constant, it doesn't
+matter how big the bagel is, the ratio of the surface areas will
+not change.
+<br>
+
+<br>
+
+Now, if we let $t = r/R$ then we can define a new function $f$
+by
+\[
+f(t) = \frac{A_\text{Möb}(R,r)}{A_\text{flat}(R,r)} = \frac{1}{4\pi}
+\int_0^{2\pi} \!\int_{-1}^1\,\sqrt{1 +
+2t\sigma\cos\theta + \frac{1}{2} t^2
+\sigma^2 (3 + \cos 2\theta)} \,d\sigma d\theta. \tag{3}
+\]
+Below is a plot of $f(t)$. Since $0 &lt; r \leq R$ our new
+parameter $t$ ranges from $0$ to $1$.<br>
+
+<br>
+
+<div style="text-align: center;"><img style="width: 500px; height: 319px;" alt="plot of the function f(t)" src="bagelrings_pics/fplot.png"></div>
+
+<br>
+
+From this plot it certainly looks like $f(t)$ is an increasing
+function, so let's try to prove this. We begin by calculating
+\[
+f'(t) = \frac{1}{4\pi}
+\int_0^{2\pi} \!\int_{-1}^1\,\frac{2\sigma\cos\theta + t\sigma^2 (3 +
+\cos 2\theta)}{2\sqrt{1 +
+2t\sigma\cos\theta + \frac{1}{2} t^2
+\sigma^2 (3 + \cos 2\theta)}} \,d\sigma d\theta.
+\]
+From this we find that $f'(0) = 0$, so if we can prove that $f''(t)
+&gt; 0$ we'll be able to conclude that $f'(t) &gt; 0$
+for $t &gt; 0$. Indeed,
+\[
+f''(t) = \frac{1}{4\pi} \int_0^{2\pi} \!\int_{-1}^1\,
+\frac{\sigma^2}{\left( 1 + 2t\sigma\cos\theta + \frac{1}{2}t^2\sigma^2
+(3+\cos 2\theta)\right)^{3/2}} \,d\sigma d\theta,
+\]
+and since the integrand is nonnegative and not identically zero we may
+conclude that $f''(t) &gt; 0$ for all $t$. As stated above, this
+implies that $f(t)$ is strictly increasing in $t$.
+<br>
+
+<br>
+
+From this we conclude the following fact.
+<br>
+
+<br>
+
+<div id="outer">
+<div id="inner2"><b>Proposition 2.</b>
+The ratio of the surface areas $A_\text{Möb}(R,r)/A_\text{flat}(R,r)$
+is a strictly increasing function of $r/R$. Since $0 &lt; r \leq R$
+we have
+\[
+1 &lt; \frac{A_\text{Möb}(R,r)}{A_\text{flat}(R,r)} \leq
+\frac{A_\text{Möb}(1,1)}{A_\text{flat}(1,1)} \approx 1.1739\ 7932\
+4030.
+\]
+</div>
+</div>
+
+<br>
+
+In essence what this says is that, for a given size of bagel, cutting
+the bagel along the two-twist Möbius strip yields the largest gains in
+surface area when the hole in the center of the bagel is the smallest.
+&nbsp; The maximum amount that the surface area can increase when
+compared with cutting the bagel straight in half is about $17.4\%$.<br>
+
+<br>
+
+The amount that the surface area can increase will be less than this
+for most bagels. &nbsp;For example, for a bagel $2$ inches thick
+and $5$ inches wide, cutting along the two-twist Möbius strip yields an
+increase in cream cheesable surface area of about $7.72\%$.
+&nbsp;Depending on how much you enjoy cream cheese this may or may
+not be worth it.<br>
+
+<br>
+
+<font style="font-family: Times New Roman;" size="+2">Approximating
+the ratio of the surface areas</font><br>
+
+<br>
+
+If we're in the middle of making breakfast then we don't really have
+time to start up our computer just to evaluate the integral in equation
+$(2)$. What would be really handy is an accurate approximation. And
+really, the assumption that our bagels are perfect torii is already an
+approximation, so we shouldn't feel too bad about the loss of accuracy.<br>
+
+<br>
+
+In this problem the path to an approximation is delightfully short. In
+the definition of the function $f(t)$ in equation $(3)$
+the parameter $t$ lies between $0$ and $1$, and in the integrand it is
+multiplied by bounded functions, so it seems appropriate to expand the
+integrand in Taylor series about the point $t=0$. We find that
+\[
+\sqrt{1 + 2t\sigma\cos\theta + \frac{1}{2} t^2 \sigma^2 (3 + \cos
+2\theta)} = 1 + t\sigma\cos\theta + \frac{1}{2}t^2\sigma^2 +
+O\left(t^3\right),
+\]
+and if we replace the integrand by these first three terms of its
+Taylor series we obtain the approximation
+\[
+\begin{align}
+\frac{A_\text{Möb}(R,r)}{A_\text{flat}(R,r)} &amp;\approx
+\frac{1}{4\pi}
+\int_0^{2\pi} \!\int_{-1}^1\, 1 + t\sigma\cos\theta +
+\frac{1}{2}t^2\sigma^2 \,d\sigma d\theta \\
+&amp;= 1 + \frac{1}{6}t^2 \\
+&amp;= 1 + \frac{1}{6} \left(\frac{r}{R}\right)^2.
+\end{align}
+\]
+This approximation produces reasonably good results. It's most accurate
+when the ratio $r/R$ is small.<br>
+
+<br>
+
+Some might say that measuring $R$ and $r$ quickly isn't as easy as just
+measuring
+the width and the height of the bagel. Of course we can
+express these quantities in terms of the others as
+\[
+R = \frac{\text{width} - \text{height}}{2}
+\]
+and
+\[
+r = \frac{\text{height}}{2},
+\]
+so we'll conclude the page with the following statement for practical
+use.
+<br>
+
+<br>
+
+<div id="outer">
+<div id="inner2"><b>Proposition 3.</b>
+The ratio of the surface area exposed by
+cutting along the two-twist Möbius strip to the area exposed by cutting
+the bagel straight in half is approximately
+\[
+1 + \frac{1}{6} \left(\frac{\text{height}}{\text{width} -
+\text{height}}\right)^2.
+\]
+</div>
+</div>
+
+<br>
+
+<font style="font-family: Times New Roman;" size="+2">Further
+reading</font>
+<br>
+
+<br>
+
+Here are some links for those of you seeking some more information on
+bagel cutting.
+<br>
+
+<br>
+
+<a href="http://www.georgehart.com/bagel/bagel.html">Mathematically
+Correct Breakfast: How to Slice a Bagel into Two Linked Halves</a>,
+the original webpage by George W. Hart<br>
+
+<br>
+
+<a href="http://mathematica.stackexchange.com/q/7545/863">Cutting
+bagels into linked halves</a>, a question on Mathematica Stack
+Exchange about rendering the sliced bagel in 3D using Mathematica<br>
+
+<br>
+
+<a href="http://www.youtube.com/watch?v=E0ZdRa917MA">Interlocking
+bagel rings</a>, a video on youtube showing another 3D rendering
+of the sliced bagel<br>
+
+<br>
+
+<hr style="width: 100%; height: 2px;"><br>
+
+<a href="http://mathstat.dal.ca/%7Eantoniov/">Antonio R.
+Vargas</a><br>
+
+February 23, 2014<br>
+
+<br>
+
+<br>
+
+</body></html>

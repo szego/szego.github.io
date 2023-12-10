@@ -1,0 +1,430 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+
+
+
+
+
+
+
+
+
+
+  
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type"><title>On the distance between zeros of Taylor polynomials of the exponential function - Antonio Vargas</title>
+  
+
+  
+  
+  <link rel="stylesheet" type="text/css" href="math.css">
+  <link rel="stylesheet" type="text/css" href="body.css">
+
+  
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full">
+  </script>
+  
+  <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+    });
+  </script></head><body style="margin: 25px auto; width: 740px;">
+<a href="http://mathstat.dal.ca/%7Eantoniov/"><img style="border: 0px solid ; width: 740px; height: 35px;" src="escher740.png" alt="back to main"></a><br>
+
+<br>
+
+<div class="section">On the distance
+between zeros of Taylor polynomials of the exponential function</div><br>
+
+<br>
+
+The exponential function of a complex variable $z$ can be written as
+the infinite series
+\[
+e^z = \sum_{k=0}^{\infty} \frac{z^k}{k!}.
+\]
+We can then let $p_{n}(z)$ denote the n<sup>th</sup> partial sum of
+this series:
+\[
+p_n(z) = \sum_{k=0}^{n} \frac{z^k}{k!}.
+\]
+This polynomial $p_n(z)$ is commonly referred to as <span style="font-style: italic;">the n</span><sup style="font-style: italic;">th</sup><span style="font-style: italic;">
+partial sum of the exponential series</span> or <span style="font-style: italic;">the n</span><sup style="font-style: italic;">th</sup><span style="font-style: italic;">
+Taylor polynomial of the exponential function</span>.
+<br>
+
+<br>
+
+We can plot the $n$ complex zeros of $p_n(z)$. Here's a plot for $n =
+44$ with the unit circle $|z| = 1$ shown in blue for reference.<br>
+
+<br>
+
+<div style="text-align: center;"><img style="width: 500px; height: 440px;" alt="A plot of the zeros of the fourty-fourth Taylor polynomial for the exponential function." src="zemyan_pics/expp44.png"><br>
+</div>
+
+<br>
+
+(The Mathematica code used to produce this image can be found at the
+bottom of the page.)<br>
+
+<br>
+
+These polynomials (and their zeros) have been studied for quite some
+time. In 2005 Stephen M. Zemyan published a very nice paper titled <a href="http://www.jstor.org/stable/30037629">"On the Zeroes of the Nth
+Partial Sum of the Exponential Series"</a> in which he gave an overview
+of some of the main results in this area and proved several new ones.
+He also posed a number of problems, and we aim to address two of those
+problems here.<br>
+
+<br>
+
+<br>
+
+<div class="section">Zemyan's problems</div><br>
+
+<br>
+
+Section 4 of Zemyan's paper explores the spacing of the zeros of
+$p_n(z)$.<br>
+
+<br>
+
+Looking at the plot above, we can see that the zeros on the left are
+closer together than the zeros on the right. For each $n \geq 2$,
+Zemyan defined the number $D_n$ to be the smallest distance between the
+zeros of
+$p_n(z)$.<br>
+
+<br>
+
+For example, the zeros of the polynomial $p_2(z) = 1 + z + z^2/2$ are
+$z = -1 \pm i$, so the distance between the zeros is $2$, and hence
+$D_2 = 2$.<br>
+
+<br>
+
+Using numerical methods we can calculate $D_n$ for larger $n$, and
+Zemyan includes the first six in his paper: \[ D_2 = 2, \quad D_3
+\approx 2.016408, \quad D_4 \approx 1.77948, \] \[ D_5 \approx
+1.775241, \quad D_6 \approx 1.676700, \quad D_7 \approx 1.672533. \]<br>
+
+<div style="text-align: center;"><img style="width: 609px; height: 607px;" alt="Plots of the zeros of p4 through p6 showing the numbers D4 through D6 defined above." src="zemyan_pics/d4thru7.png"><br>
+</div>
+
+<br>
+
+Zemyan notes that $D_n$ seems to decrease for $n \geq 3$,
+and in <span style="font-weight: bold;">Theorem 4</span> of his paper
+gives an explicit lower bound:<br>
+
+<br>
+
+<br>
+
+<div id="outer">
+<div id="inner2"><b>Theorem 4 [Zemyan].</b> $D_n \geq 0.290444$ for all
+$n \geq 2$.<br>
+</div>
+</div>
+
+<br>
+
+<br>
+
+He then poses two problems relating to the spacing of the zeros (<span style="font-weight: bold;">Problem 3</span>
+and <span style="font-weight: bold;">Problem 4</span> in the paper):<br>
+
+<br>
+
+<br>
+
+<div id="outer">
+<div id="inner2"><b>Problem 3 </b><b>[Zemyan]</b><b>.</b>
+Determine the exact value of $\lim_{n \to \infty} D_n$.
+</div>
+</div>
+
+<br>
+
+<br>
+
+<div id="outer">
+<div id="inner2"><b>Problem 4 </b><b>[Zemyan]</b><b>.</b>
+Prove or disprove: for fixed $n$, the distance between adjacent zeros
+of $p_n(z)$ increases as the
+real parts of the zeros increase.
+</div>
+</div>
+
+<br>
+
+<br>
+
+Problem 4 restates what we noticed earlier about the zeros, that the
+ones on the left are closer together than the ones on the right.<br>
+
+<br>
+
+We don't aim to give completely rigorous solutions to these two
+problems. Instead we will explore them from an asymptotic perspective,
+tackling them with approximations rather than exact formulae. To do
+this we'll first need to piece together a few known facts about the
+polynomials $p_n(z)$.<br>
+
+<br>
+
+<br>
+
+<div class="section">The Szegő curve</div><br>
+
+<br>
+
+As Zemyan notes in his paper, Szegő showed in 1924 that the zeros of
+$p_n(z)$ grow proportionally to $n$ as $n$ increases. Even more, Szegő
+showed that after scaling all the zeros by $1/n$, as $n \to \infty$
+they converge to the curve defined by \[ \left| ze^{1-z} \right| = 1,
+\quad |z| \leq 1. \] This curve has come to be known as <span style="font-style: italic;">the Szegő curve</span>.<br>
+
+<br>
+
+Here's a plot of the zeros of $p_{44}(45z)$ with the Szegő curve shown
+in red and the unit circle shown in blue. Compare this with the plot of
+the zeros of $p_{44}(z)$ at the top of the page.<br>
+
+<br>
+
+<div style="text-align: center;"><img style="width: 500px; height: 491px;" alt="A plot of the zeros of p45 of 45z with the Szego curve." src="zemyan_pics/szegocurve.png"><br>
+</div>
+
+<br>
+
+Let's call the Szegő curve $S$ for short.<br>
+
+<br>
+
+There are two points of $S$ which are of particular interest: the
+corner on the right, and the base of the bulb all the way on the left.
+The corner is located at $z=1$, but it's a little trickier to find
+where the base of the bulb is located.<br>
+
+<br>
+
+The base lies on the real axis, so we'll write $z=x$ to indicate that
+it's a real variable. We also note that $x$ is negative. By
+using these facts in the definition of $S$ we get that \[ 1 = \left|
+ze^{1-z} \right| = -xe^{1-x}, \] and so \[ -xe^{-x} = 1/e. \] Calling
+on our friend <a href="https://en.wikipedia.org/wiki/Lambert_W_function">the Lambert W
+function</a>, we can solve this equation to get $-x = W(1/e)$ and hence
+$x = -W(1/e)$. We have proved the following Lemma.<br>
+
+<br>
+
+<br>
+
+<div id="outer">
+<div id="inner2"><b>Lemma</b><b> 1.</b> The corner of $S$ is located at
+$z=1$ and the leftmost point of $S$ is located at $z=-W(1/e)$, where
+$W$ is the Lambert W function.
+</div>
+</div>
+
+<br>
+
+<br>
+
+We will also need some way to approximate the zeros. The following
+lemma is a bit technical but very cool. The limit in it was essentially
+first obtained by Edrei, Saff, and
+Varga in their monograph <a href="http://www.springer.com/us/book/9783540123187"><span style="font-style: italic;">Zeros of Sections of Power Series</span></a>.
+A proof of a more general version of it can be found in chapter 4 of <a href="https://arxiv.org/abs/1610.03387">my PhD thesis</a>. I may
+eventually write another note here giving a direct proof of this
+specific case, but for now let's just accept the result and see where
+it gets us.<br>
+
+<br>
+
+<br>
+
+<div id="outer">
+<div id="inner2"><b>Lemma</b><b> 2.</b> Let $\xi \in S$ with $\xi \neq
+1$ and define $\tau = \operatorname{Im}(\xi - 1 - \log \xi)$. Define
+the sequence $(\tau_n)$ by \[ \tau_n \equiv n\tau \pmod{2\pi}, \quad
+-\pi &lt; \tau_n \leq \pi \] and set \[ z_n(w) = n\xi \left(1 +
+\frac{\log n}{2(1-\xi)n} - \frac{w-i\tau_n}{(1-\xi)n}\right). \] Then
+\[ \lim_{n \to \infty} \frac{p_{n-1}(z_n(w))}{\exp(z_n(w))} = 1 -
+\frac{e^{-w}}{(1-\xi)\sqrt{2\pi}} \] uniformly on compact subsets of
+the $w$-plane.
+</div>
+</div>
+
+<br>
+
+<br>
+
+How can we interpret this? The main idea is that the argument $z_n(w)$
+which gets plugged into the polynomial $p_{n-1}(z)$ is designed so that
+it
+"tracks" with the zeros of $p_{n-1}(z)$ as $n$ grows. We can illustrate
+this with an animation.<br>
+
+<br>
+
+In this animation we show the zeros of $p_{n-1}(z)$ as $n$ increases
+from
+$20$ to $100$. We also draw a rectangle indicating the range of
+$z_n(w)$ as $w$ ranges over the square with corners at $\pm 15 \pm 15i$.<br>
+
+<br>
+
+<div style="text-align: center;"><img style="width: 720px; height: 639px;" alt="An animation illustrating the limit in Lemma 2." src="zemyan_pics/scalinglimit.gif"><br>
+</div>
+
+<br>We can see that the square follows along with the zeros, staying at
+roughly the same place on the arc. The number of zeros in the square is
+eventually constant, and
+the zeros in the square gradually flatten out into a straight line.
+What
+Lemma 2 is saying is that, inside any moving square like this one, the
+partial sums $p_{n-1}(z)$ look a lot like the function $1-Ce^{-w}$ for
+some
+constant $C$, so we can approximate the zeros of the former with the
+zeros of the latter. We just need to plug the zeros of $1-Ce^{-w}$ back
+into the map $z_n(w)$ to get approximations for the zeros of
+$p_{n-1}(z)$.<br>
+
+<br>
+
+Here's a plot where we've chosen an arbitrary point
+$\xi$ (shown in blue) on the Szegő curve $S$ and used Lemma 2 to obtain
+approximations for the zeros of $p_{44}(45z)$ near $\xi$. The
+approximations are shown as blue crosses. Near $\xi$ the approximations
+are very good.<br>
+
+<br>
+
+<div style="text-align: center;"><img style="width: 720px; height: 339px;" alt="A plot showing some of the approximations given by Lemma 2 for a given point xi." src="zemyan_pics/approximatezeros.png"><br>
+</div>
+
+<br><br>
+
+
+<div id="outer">
+<div id="inner2"><b>Remark</b><b>.</b>&nbsp;
+
+Lemma 2 is an example of a <span style="font-style: italic;">scaling
+limit</span>.
+In general these types of results talk about what happens when you
+"zoom in" on interesting features of some complicated quantity. They
+say that if you zoom in the right way, you'll find that the landscape
+looks a lot like a simpler one you know more about.
+</div>
+</div>
+
+
+<br>
+
+
+<br>We've gathered all the necessary tools so let's get back to Zemyan's
+problems.<br>
+
+<br>
+
+<br>
+
+<div class="section">Addressing the
+problems</div><br>
+
+<br>
+
+Let $\xi$ be any point of the Szegő curve $S$ except for its corner
+(so $\xi \neq 1$). Using Lemma 2, if $w_1$ and $w_2$ are solutions to
+the equation \[ 1 - \frac{e^{-w}}{(1-\xi)\sqrt{2\pi}} = 0, \tag{$*$} \]
+then $p_{n-1}(z)$ has zeros of the form \[ z = z_n(w_1) + \epsilon_1(n)
+\qquad \text{and} \qquad z = z_n(w_2) + \epsilon_2(n), \] where
+$\epsilon_1(n) \to 0$ and $\epsilon_2(n) \to 0$ as $n \to \infty$.<br>
+
+<br>
+
+The distance between adjacent roots of equation $(*)$ is $2\pi$, so the
+limiting distance between the adjacent zeros of $p_{n-1}(z)$ which are
+closest to $n\xi$ is \[ \begin{align} |z_n(w_1) - z_n(w_2)| &amp;=
+\left| n\xi \left(1 +
+\frac{\log n}{2(1-\xi)n} - \frac{w_1-i\tau_n}{(1-\xi)n}\right) - n\xi
+\left(1 +
+\frac{\log n}{2(1-\xi)n} - \frac{w_2-i\tau_n}{(1-\xi)n}\right) \right|
+\\ &amp;= |w_1 - w_2| \left|\frac{\xi}{1-\xi} \right| \\ &amp;= 2\pi
+\left|\frac{\xi}{1-\xi} \right|. \tag{$**$} \end{align} \] If $\xi \in
+S$ then $|\xi| = e^{\operatorname{Re} \xi - 1}$, so $|\xi|$ increases
+as $\xi$ moves from the leftmost point
+of $S$ at $\xi = -W(1/e)$ toward the corner at $\xi = 1$, while $|1 -
+\xi|$ decreases. Thus the limiting distance between adjacent zeros,
+$2\pi|\xi/(1-\xi)|$, increases as the real part of $\xi$ increases and
+is minimized when $\xi = -W(1/e)$.<br>
+
+<br>
+
+Zemyan's Problem 4 asks whether the distance between adjacent zeros
+increases as the real parts of the zeros increase, and we have shown
+that this is, indeed, asymptotically true.<br>
+
+<br>
+
+Zemyan's Problem 3 asks about the limit of $D_n$, the minimum distance
+between zeros of $p_n(z)$. Equation $(**)$ and the above argument yield
+the following result.<br>
+
+<br>
+
+<br>
+
+<div id="outer">
+<div id="inner2"><b>Theorem</b><b>.</b>&nbsp; \[ \lim_{n \to \infty}
+D_n = 2\pi \frac{W(1/e)}{1+W(1/e)} \approx 1.368551. \]
+</div>
+</div>
+
+<br>
+
+<br>
+As a sanity check, this value is consistent with the values of $D_2,
+\ldots, D_7$ and Zemyan's lower bound. Even further, numerical
+computation yields $D_{100} \approx 1.399862$ and $D_{200} \approx 1.385674$.<br>
+
+<br>
+
+If anyone has made progress on any of Zemyan's other problems I would
+love to hear about it. It would be nice to maintain a small repository
+of information about them.<br>
+<br>
+<br>
+<span style="font-weight: bold;">Update Feb 8, 2018:</span> The value of $D_{100}$ at the end was computed incorrectly.
+This page has been updated with the correct value.<br>
+<br>
+<span style="font-weight: bold;">Update Mar 29, 2018:</span> The value
+of $D_{200}$ was also computed incorrectly. I've recomputed $D_{100}$
+and $D_{200}$ using a different method and I'm pretty sure they're
+right now.<br>
+
+<br>
+
+<br>
+
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+The Mathematica notebook (.nb) which I used to create the images in this note can be downloaded <a href="zemyan_pics/zemyan_pics.nb">here</a>.<span style="font-weight: bold;"></span><br>
+<br>
+
+<br>
+
+<hr style="width: 100%; height: 2px;"><br>
+
+<a href="http://mathstat.dal.ca/%7Eantoniov/">Antonio R.
+Vargas</a><br>
+
+February 7, 2018<br>
+
+<br>
+
+<br>
+
+</body></html>
