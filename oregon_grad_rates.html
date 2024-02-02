@@ -1984,7 +1984,7 @@ p(\theta) = \frac{1}{100} \sum_{k=0}^{9} \sum_{n = k}^{k+9} \operatorname{Binomi
 <h1><span class="header-section-number">4</span> The four models</h1>
 <p>We will fit four increasingly complex models building on the “heart” described above using the <a href="https://mc-stan.org/">Stan</a> sampling engine.</p>
 <p>In the first model we will estimate the overall graduation rate of the cohort. In the second we will compare the graduation rates of the racial-ethnic groups in the data, controlling for gender and the main effects of being an English learner, having a disability, being homeless, and being economically disadvantaged. In the third model we will include interactions among these four burdening factors. After fitting these three models we will carry out an analysis comparing the estimated predictive power of each model using the PSIS-LOO information criterion, and finally we will fit a fourth model incorporating what we have learned from the comparison.</p>
-<p>The Stan code for each of these models can be downloaded <a href="https://mathstat.dal.ca/~antoniov/oregongr_stan/">here</a>. We will make references to it throughout.</p>
+<p>The Stan code for each of these models can be downloaded <a href="https://szego.github.io/oregongr_stan/">here</a>. We will make references to it throughout.</p>
 <div id="implementing-the-likelihood" class="section level2">
 <h2><span class="header-section-number">4.1</span> Implementing the likelihood</h2>
 <p>As described in <a href="#modelheart">section 3</a>, we will use a Binomial likelihood in our models, marginalizing out certain variables when they are suppressed in the data.</p>
@@ -2698,7 +2698,7 @@ a &amp;\sim \operatorname{Normal}(0, 4), \\
 5 - Multi-Racial
 6 - Native Hawaiian/Pacific Islander
 7 - White</code></pre>
-<p>This table can be downloaded as a .csv file <a href="https://mathstat.dal.ca/~antoniov/oregongr_files/estimated_grad_rates.csv">here</a>.</p>
+<p>This table can be downloaded as a .csv file <a href="https://szego.github.io/oregongr_files/estimated_grad_rates.csv">here</a>.</p>
 </div>
 </div>
 <div id="conclusion" class="section level1">
@@ -2707,7 +2707,7 @@ a &amp;\sim \operatorname{Normal}(0, 4), \\
 <p>The data we analyzed contains information about the numbers of graduates and the total numbers of students in different subgroups of high school students in Oregon. We estimated the average effects of race/ethnicity, of gender, and of the interactions of four burdening factors: being an English learner, having a disability, being homeless, and being economically disadvantaged.</p>
 <p>In its state plan<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a> under ESSA, Oregon has set the goal of achieving 90% graduation rates for every student group we discussed by 2025. I hope the analysis presented here shows the value of the new cross-tabulated data being released in revealing underlying connections between these groups. These connections will need to be taken into account when developing and implementing statewide programs.</p>
 <hr />
-<p><a href="https://mathstat.dal.ca/~antoniov/">Antonio R. Vargas</a></p>
+<p><a href="https://szego.github.io/">Antonio R. Vargas</a></p>
 <p>20 Jan 2019</p>
 <p><em>Updated 11 Mar 2019</em></p>
 </div>
